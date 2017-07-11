@@ -1,19 +1,11 @@
 <?php include 'includes/functions.php' ?>
 <?php
-	if (isset($_POST["btnSubmit"])) {
-		$username = $_POST["txtUsername"];
-		$password = $_POST["txtPassword"];
-		
-		if (isset($username) && isset($password)) {
-			if (($userID = verifyAccount($username, $password)) != "-1") {
-				successfulLogin($userID);
-			}
-		}
-	}
+	$warning1 = "";
+	$warning2 = "";
 ?>
 <html>
 	<head>
-		<title>Login</title>
+		<title>Forgot Password</title>
 		
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -31,16 +23,24 @@
 		<div id="navigationbar" class="clearfix">
 			<ul>
 				<li style="float: right;"><a id="lnkRegister" href="register.php">Register</a></li>
-				<li style="float: right;"><a id="lnkLogin" class="active" href="#">Login</a></li>
+				<li style="float: right;"><a id="lnkLogin" href="index.php">Login</a></li>
 			</ul>
 		</div>
-		<div class="col-lg-3 form-wrapper">
-			<form method="post" action="index.php">
-				<p class="modal-header"><strong>Welcome to TheGiftExchange.net!</strong></p>
-				<input type="text" name="txtUsername" class="form-control form-text" placeholder="Username" required />
-				<input type="password" name="txtPassword" class="form-control form-text" placeholder="Password" required />
-				<input type="submit" value="Login" name="btnSubmit" class="btn btn-md btn-success btn-block form-text" />
-				<span>Forgot password? <a href="forgotpassword.php" style="color: lightgreen; text-decoration: none;">Recover account</a></span>
+		<div name="pnlPasswordReset" class="col-lg-3 form-wrapper" style="display: none;">
+			<form method="post" action="forgotpassword.php">
+				<p class="modal-header"><strong>Password reset</strong></p>
+				<input type="password" name="txtPassword" placeholder="Password" class="form-control form-text" required />
+				<input type="password" name="txtConfPass" placeholder="Confirm Password" class="form-control form-text" required />
+				<input type="submit" name="btnReset" value="Reset Password" class="btn btn-md btn-success btn-block" />
+				<span class="warning"><?php echo $warning1 ?></span>
+			</form>
+		</div>
+		<div name="pnlEmailPassword" class="col-lg-3 form-wrapper">
+			<form method="post" action="forgotpassword.php">
+				<p class="modal-header"><strong>Account recovery</strong></p>
+				<input type="email" name="txtEmail" placeholder="Email" class="form-control form-text" required />
+				<input type="submit" name="btnSend" value="Send Reset Link" class="btn btn-md btn-success btn-block" />
+				<span class="warning"><?php echo $warning2 ?></span>
 			</form>
 		</div>
 	</body>

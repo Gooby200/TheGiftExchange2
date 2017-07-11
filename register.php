@@ -49,6 +49,8 @@
 		</div>
 	</body>
 	<footer>
-		<?php include 'includes/master_footer.php' ?>
+		<div class="col-lg-3 footer-wrapper">
+			<?php include 'includes/master_footer.php' ?>
+		</div>
 	</footer>
 </html>
