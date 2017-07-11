@@ -1,4 +1,31 @@
 <?php	
+	function verifyTokenInformation($email, $token) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT * FROM Users WHERE Email=? AND PasswordResetToken=?");
+			mysqli_stmt_bind_param($stmt, 'ss', $email, $token);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			
+			if (mysqli_stmt_num_rows($stmt) >= 1) {
+				echo "a";
+				return true;
+			} else {
+				echo "b";
+				return false;
+			}
+		} catch (Exception $ex) {
+			echo $ex;
+			return false;
+		}
+	}
+	
 	function registerAccount($username, $firstname, $lastname, $birthdate, $email, $password) {
 		try {
 			$dbhost = "gastonpesa.com";

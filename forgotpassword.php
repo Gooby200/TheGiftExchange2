@@ -2,6 +2,30 @@
 <?php
 	$warning1 = "";
 	$warning2 = "";
+	
+	$email = isset($_GET["email"]);
+	$token = isset($_GET["token"]);
+	
+	$pwResetStyle = 'style="display: none;"';
+	$emailPasswordStyle = '';
+	
+	if ($email != null && $token != null) {
+		if (verifyTokenInformation($email, $token)) {
+			$emailPasswordStyle = 'style="display: none;"';
+			$pwResetStyle = '';
+			echo "1";
+		} else {
+			$emailPasswordStyle = '';
+			$pwResetStyle = 'style="display: none;"';
+			echo "2";
+		}
+	} else {
+		$emailPasswordStyle = '';
+		$pwResetStyle = 'style="display: none;"';
+		echo "3";
+	}
+	
+	
 ?>
 <html>
 	<head>
@@ -26,7 +50,7 @@
 				<li style="float: right;"><a id="lnkLogin" href="index.php">Login</a></li>
 			</ul>
 		</div>
-		<div name="pnlPasswordReset" class="col-lg-3 form-wrapper" style="display: none;">
+		<div name="pnlPasswordReset" class="col-lg-3 form-wrapper" <?php echo $pwResetStyle; ?>>
 			<form method="post" action="forgotpassword.php">
 				<p class="modal-header"><strong>Password reset</strong></p>
 				<input type="password" name="txtPassword" placeholder="Password" class="form-control form-text" required />
@@ -35,7 +59,7 @@
 				<span class="warning"><?php echo $warning1 ?></span>
 			</form>
 		</div>
-		<div name="pnlEmailPassword" class="col-lg-3 form-wrapper">
+		<div name="pnlEmailPassword" class="col-lg-3 form-wrapper" <?php echo $emailPasswordStyle; ?>>
 			<form method="post" action="forgotpassword.php">
 				<p class="modal-header"><strong>Account recovery</strong></p>
 				<input type="email" name="txtEmail" placeholder="Email" class="form-control form-text" required />
