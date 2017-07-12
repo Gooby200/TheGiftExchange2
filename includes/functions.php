@@ -1,4 +1,58 @@
 <?php	
+	function getBirthDate($userID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT BirthDate FROM Users WHERE UserID=?");
+			mysqli_stmt_bind_param($stmt, 's', $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $birthDate);
+			$result = mysqli_stmt_num_rows($stmt);
+			if ($result == 1) {
+				while (mysqli_stmt_fetch($stmt)) {
+					return $birthDate;
+				}
+			} else {
+				return "";
+			}
+		} catch (Exception $ex) {
+			echo $ex;
+			return "";
+		}
+	}
+	
+	function getLastName($userID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT LastName FROM Users WHERE UserID=?");
+			mysqli_stmt_bind_param($stmt, 's', $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $lastName);
+			$result = mysqli_stmt_num_rows($stmt);
+			if ($result == 1) {
+				while (mysqli_stmt_fetch($stmt)) {
+					return $lastName;
+				}
+			} else {
+				return "";
+			}
+		} catch (Exception $ex) {
+			echo $ex;
+			return "";
+		}
+	}
+	
 	function getFirstName($userID) {
 		try {
 			$dbhost = "gastonpesa.com";

@@ -7,6 +7,9 @@
 	$warning1 = "";
 	$warning2 = "";
 	
+	$firstName = getFirstName($_SESSION["userID"]);
+	$lastName = getLastName($_SESSION["userID"]);
+	$birthDate = getBirthDate($_SESSION["userID"]);	
 ?>
 <html>
 	<head>
@@ -38,11 +41,11 @@
 		<div class="col-lg-3 form-wrapper">
 			<form method="post" action="account.php">
 				<p class="modal-header"><strong>General account settings</strong></p>
-				<input type="text" name="txtFirstName" placeholder="First Name" class="form-control form-text" required />
-				<input type="text" name="txtLastName" placeholder="Last Name" class="form-control form-text" required />
+				<input type="text" name="txtFirstName" placeholder="First Name" value="<?php echo $firstName; ?>" class="form-control form-text" required />
+				<input type="text" name="txtLastName" placeholder="Last Name" value="<?php echo $lastName; ?>" class="form-control form-text" required />
 				<div class="form-group form-text">
 					<small><strong>Birthdate</strong></small>
-					<input type="date" name="txtDate" class="form-control" required />
+					<input type="date" name="txtDate" value="<?php echo $birthDate; ?>" class="form-control" required />
 				</div>
 				<input type="submit" name="btnPersonalInfo" value="Change Personal Information" class="btn btn-md btn-success btn-block form-text" />
 				<span class="warning"><?php echo $warning1; ?></span>
