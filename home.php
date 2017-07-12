@@ -1,6 +1,8 @@
 <?php include 'includes/functions.php' ?>
 <?php
-	$name = "asdfasdf";
+	isLoggedIn();
+	
+	$name = "[first name]";
 ?>
 <html>
 	<head>

@@ -1,0 +1,5 @@
+==forgotpassword.php==
++When send password is clicked, email reset link to the email in database
+
+==home.php==
++Set page startup logic to where if the user isn't logged in, it doesn't show that page

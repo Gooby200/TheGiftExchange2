@@ -1,11 +1,27 @@
 <?php	
+	function updatePassword($email, $newPassword) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE Email=?");
+			mysqli_stmt_bind_param($stmt, 'ss', $newPassword, $email);
+			return mysqli_stmt_execute($stmt);
+		} catch (Exception $ex) {
+			echo $ex;
+			return false;
+		}
+	}
+	
 	function verifyTokenInformation($email, $token) {
 		try {
 			$dbhost = "gastonpesa.com";
 			$dbuser = "gooby200_admin";
 			$dbpass = "5zN&EH=6ztg4";
 			$dbname = "gooby200_giftregistry";
-			
 			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 			
 			$stmt = mysqli_prepare($link, "SELECT * FROM Users WHERE Email=? AND PasswordResetToken=?");
@@ -14,10 +30,8 @@
 			mysqli_stmt_store_result($stmt);
 			
 			if (mysqli_stmt_num_rows($stmt) >= 1) {
-				echo "a";
 				return true;
 			} else {
-				echo "b";
 				return false;
 			}
 		} catch (Exception $ex) {
@@ -109,6 +123,20 @@
 		}
 	}
 	
+	function isLoggedIn() {
+		session_start();
+		
+		if (isset($_SESSION["userID"])) {
+			if ($_SESSION["userID"] == null || $_SESSION["userID"] == -1) {
+				session_destroy();
+				header("Location: index.php");
+			}
+		} else {
+			session_destroy();
+			header("Location: index.php");
+		}
+	}
+	
 	function successfulLogin($userID) {
 		try {
 			$dbhost = "gastonpesa.com";
@@ -121,8 +149,11 @@
 			$stmt = mysqli_prepare($link, "UPDATE Users SET LastLogon=? WHERE UserID=?");
 			mysqli_stmt_bind_param($stmt, 'ss', $today, $userID);
 			mysqli_stmt_execute($stmt);
+						
+			session_start();
 			
 			$_SESSION["userID"] = $userID;
+			
 			header("Location: home.php");
 		} catch (Exception $ex) {
 			echo $ex;
@@ -164,4 +195,41 @@
 		mysqli_close($link);
 	
 	}
+	
+	function verifyAccountByEmail($email, $password) {		
+		$dbhost = "gastonpesa.com";
+		$dbuser = "gooby200_admin";
+		$dbpass = "5zN&EH=6ztg4";
+		$dbname = "gooby200_giftregistry";
+	
+		$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+		
+		$stmt = mysqli_prepare($link, "SELECT UserID, Password FROM Users WHERE Email=?");
+		mysqli_stmt_bind_param($stmt, 's', $email);
+		
+		mysqli_stmt_execute($stmt);
+		
+		mysqli_stmt_store_result($stmt);
+		
+		mysqli_stmt_bind_result($stmt, $userID, $hashPass);
+		
+		$result = mysqli_stmt_num_rows($stmt);
+		
+		if ($result == 1) {
+			while (mysqli_stmt_fetch($stmt)) {
+				if (password_verify($password, $hashPass)) {
+					return $userID;
+				} else {
+					return -1;
+				}
+			}
+		} else {
+			return -1;
+		}
+		
+		mysqli_stmt_close($stmt);
+		mysqli_close($link);
+	
+	}
+
 ?>

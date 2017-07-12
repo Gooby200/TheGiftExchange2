@@ -2,30 +2,55 @@
 <?php
 	$warning1 = "";
 	$warning2 = "";
-	
-	$email = isset($_GET["email"]);
-	$token = isset($_GET["token"]);
-	
+		
 	$pwResetStyle = 'style="display: none;"';
 	$emailPasswordStyle = '';
 	
-	if ($email != null && $token != null) {
-		if (verifyTokenInformation($email, $token)) {
-			$emailPasswordStyle = 'style="display: none;"';
-			$pwResetStyle = '';
-			echo "1";
+	$email = "";
+	$token = "";
+	
+	if (isset($_GET["email"]) && isset($_GET["token"])) {
+		$email = $_GET["email"];
+		$token = $_GET["token"];
+		
+		if (($email != null || $email != "") && ($token != null || $token != "")) {
+			if (verifyTokenInformation($email, $token)) {
+				$emailPasswordStyle = 'style="display: none;"';
+				$pwResetStyle = '';
+			} else {
+				$emailPasswordStyle = '';
+				$pwResetStyle = 'style="display: none;"';
+			}
 		} else {
 			$emailPasswordStyle = '';
 			$pwResetStyle = 'style="display: none;"';
-			echo "2";
 		}
-	} else {
-		$emailPasswordStyle = '';
-		$pwResetStyle = 'style="display: none;"';
-		echo "3";
 	}
 	
+	if (isset($_POST["btnReset"])) {
+		if (($email != null || $email != "") && ($token != null || $token != "")) {
+			if (isset($_POST["txtPassword"]) && isset($_POST["txtConfPass"])) {
+				if (($_POST["txtPassword"] != null || trim($_POST["txtPassword"]) != "") && ($_POST["txtConfPass"] != null || trim($_POST["txtConfPass"]) != "")) {
+					if ($_POST["txtPassword"] == $_POST["txtConfPass"]) {
+						if (verifyTokenInformation($email, $token)) {
+							if (updatePassword($email, $_POST["txtPassword"])) {
+								$userID = verifyAccountByEmail($email, $_POST["txtPassword"]);
+								successfulLogin($userID);
+							}
+						}	
+					}
+				}
+			}
+		}
+	}
 	
+	if (isset($_POST["btnSend"])) {
+		if (isset($_POST["txtEmail"])) {
+			if (doesEmailAlreadyExist($_POST["txtEmail"])) {
+				//email token link
+			}
+		}
+	}
 ?>
 <html>
 	<head>
