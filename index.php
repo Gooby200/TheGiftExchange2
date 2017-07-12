@@ -1,5 +1,9 @@
 <?php include 'includes/functions.php' ?>
 <?php
+	if (isLoggedIn()) {
+		header("Location: home.php");
+	}
+	
 	if (isset($_POST["btnSubmit"])) {
 		$username = $_POST["txtUsername"];
 		$password = $_POST["txtPassword"];

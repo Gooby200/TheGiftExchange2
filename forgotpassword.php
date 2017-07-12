@@ -1,5 +1,9 @@
 <?php include 'includes/functions.php' ?>
 <?php
+	if (isLoggedIn()) {
+		header("Location: home.php");
+	}
+	
 	$warning1 = "";
 	$warning2 = "";
 		
@@ -46,6 +50,8 @@
 	
 	if (isset($_POST["btnSend"])) {
 		if (isset($_POST["txtEmail"])) {
+			$warning2 = "<br />This feature is not yet implemented.";
+			
 			if (doesEmailAlreadyExist($_POST["txtEmail"])) {
 				//email token link
 			}

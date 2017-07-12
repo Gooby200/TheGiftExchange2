@@ -1,5 +1,9 @@
 <?php include 'includes/functions.php' ?>
 <?php
+	if (isLoggedIn()) {
+		header("Location: home.php");
+	}
+	
 	if (isset($_POST["btnRegister"])) {
 		if (registerAccount($_POST["txtUsername"], $_POST["txtFirstName"], $_POST["txtLastName"], $_POST["txtDate"], $_POST["txtEmail"], $_POST["txtPassword"])) {
 			$userID = verifyAccount($_POST["txtUsername"], $_POST["txtPassword"]);

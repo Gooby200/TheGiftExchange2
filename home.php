@@ -1,8 +1,10 @@
 <?php include 'includes/functions.php' ?>
 <?php
-	isLoggedIn();
+	if (!isLoggedIn()) {
+		destroySession();
+	}
 	
-	$name = "[first name]";
+	$name = getFirstName($_SESSION["userID"]);
 ?>
 <html>
 	<head>
@@ -23,7 +25,7 @@
 	<body>
 		<div id="navigationbar" class="clearfix">
 			<ul>
-				<li><a id="lnkHome" class="active" href="#">Home</a></li>
+				<li><a id="lnkHome" class="active" href="home.php">Home</a></li>
 				<li><a id="lnkView" href="view.php">View</a></li>
 				<li><a id="lnkCreate" href="create.php">Create</a></li>
 				<li><a id="lnkAccount" href="account.php">Account</a></li>

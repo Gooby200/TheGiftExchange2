@@ -1,4 +1,31 @@
 <?php	
+	function getFirstName($userID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT FirstName FROM Users WHERE UserID=?");
+			mysqli_stmt_bind_param($stmt, 's', $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $firstName);
+			$result = mysqli_stmt_num_rows($stmt);
+			if ($result == 1) {
+				while (mysqli_stmt_fetch($stmt)) {
+					return $firstName;
+				}
+			} else {
+				return "";
+			}
+		} catch (Exception $ex) {
+			echo $ex;
+			return "";
+		}
+	}
+	
 	function updatePassword($email, $newPassword) {
 		try {
 			$dbhost = "gastonpesa.com";
@@ -123,17 +150,22 @@
 		}
 	}
 	
+	function destroySession() {
+		session_destroy();
+		header("Location: index.php");
+	}
+	
 	function isLoggedIn() {
 		session_start();
 		
 		if (isset($_SESSION["userID"])) {
 			if ($_SESSION["userID"] == null || $_SESSION["userID"] == -1) {
-				session_destroy();
-				header("Location: index.php");
+				return false;
+			} else {
+				return true;
 			}
 		} else {
-			session_destroy();
-			header("Location: index.php");
+			return false;
 		}
 	}
 	
