@@ -33,10 +33,13 @@
 	</head>
 	<body>
 		<div id="navigationbar" class="clearfix">
-			<ul>
-				<li style="float: right;"><a id="lnkRegister" href="register.php">Register</a></li>
-				<li style="float: right;"><a id="lnkLogin" class="active" href="#">Login</a></li>
-			</ul>
+			<div class="col-lg-offset-7">
+				<ul>
+					<li><a id="lnkRegister" href="register.php">Register</a></li>
+					<li><a id="lnkLogin" class="active" href="#">Login</a></li>
+
+				</ul>
+			</div>
 		</div>
 		<div class="col-lg-3 form-wrapper">
 			<form method="post" action="index.php">

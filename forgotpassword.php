@@ -76,10 +76,12 @@
 	</head>
 	<body>
 		<div id="navigationbar" class="clearfix">
-			<ul>
-				<li style="float: right;"><a id="lnkRegister" href="register.php">Register</a></li>
-				<li style="float: right;"><a id="lnkLogin" href="index.php">Login</a></li>
-			</ul>
+			<div class="col-lg-offset-7">
+				<ul>
+					<li><a id="lnkRegister" href="register.php">Register</a></li>
+					<li><a id="lnkLogin" href="index.php">Login</a></li>
+				</ul>
+			</div>
 		</div>
 		<div name="pnlPasswordReset" class="col-lg-3 form-wrapper" <?php echo $pwResetStyle; ?>>
 			<form method="post" action="forgotpassword.php">

@@ -24,14 +24,16 @@
 	</head>
 	<body>
 		<div id="navigationbar" class="clearfix">
-			<ul>
-				<li><a id="lnkHome" class="active" href="home.php">Home</a></li>
-				<li><a id="lnkView" href="view.php">View</a></li>
-				<li><a id="lnkCreate" href="create.php">Create</a></li>
-				<li><a id="lnkAccount" href="account.php">Account</a></li>
-				<li><a id="lnkAboutMe" href="about.php">About Me</a></li>
-				<li><a id="lnkLogout" href="logout.php">Logout</a></li>
-			</ul>
+			<div class="col-lg-offset-2">
+				<ul>
+					<li><a id="lnkHome" class="active" href="home.php">Home</a></li>
+					<li><a id="lnkView" href="view.php">View</a></li>
+					<li><a id="lnkCreate" href="create.php">Create</a></li>
+					<li><a id="lnkAccount" href="account.php">Account</a></li>
+					<li><a id="lnkAboutMe" href="about.php">About Me</a></li>
+					<li><a id="lnkLogout" href="logout.php">Logout</a></li>
+				</ul>
+			</div>
 		</div>
 		<div class="col-lg-8 window-wrapper">
 			<p class="modal-header"><strong>Welcome <?php echo $name ?>!</strong></p>
