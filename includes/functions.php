@@ -1,4 +1,103 @@
 <?php	
+	
+	function changePassword($userID, $email, $currentPassword, $newPassword) {
+		if (trim($email) == "" || trim($currentPassword) == "" || trim($newPassword) == "") {
+			return false;
+		} else {
+			try {
+				$correctCredentials = false;
+				
+				$dbhost = "gastonpesa.com";
+				$dbuser = "gooby200_admin";
+				$dbpass = "5zN&EH=6ztg4";
+				$dbname = "gooby200_giftregistry";
+				
+				$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+				
+				$stmt = mysqli_prepare($link, "SELECT Password FROM Users WHERE UserID=? AND Email=?");
+				mysqli_stmt_bind_param($stmt, 'ss', $userID, $email);
+				mysqli_stmt_execute($stmt);
+				mysqli_stmt_store_result($stmt);
+				mysqli_stmt_bind_result($stmt, $hashPass);
+				
+				while (mysqli_stmt_fetch($stmt)) {
+					if (password_verify($currentPassword, $hashPass)) {
+						$correctCredentials = true;
+					}
+				}
+				
+				if ($correctCredentials) {
+					$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE UserID=? AND Email=?");
+					mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $);
+					mysqli_stmt_execute($stmt);
+				}
+				
+				return true;
+			} catch (Exception $ex) {
+				return false;
+			}
+		}
+	}
+	
+	function updatePersonalInformation($userID, $firstName, $lastName, $birthDate) {
+		if (trim($firstName) == "" || trim($lastName) == "" || trim($birthDate) == "") {
+			return false;
+		} else {
+			if (strlen($birthDate) != 10) {
+				return false;
+			} else {
+				try {
+					$dbhost = "gastonpesa.com";
+					$dbuser = "gooby200_admin";
+					$dbpass = "5zN&EH=6ztg4";
+					$dbname = "gooby200_giftregistry";
+					
+					$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+					
+					$stmt = mysqli_prepare($link, "UPDATE Users SET FirstName=?, LastName=?, BirthDate=? WHERE UserID=?");
+					mysqli_stmt_bind_param($stmt, 'ssss', $firstName, $lastName, $birthDate, $userID);
+					mysqli_stmt_execute($stmt);
+					
+					
+					return true;
+				} catch (Exception $ex) {
+					return false;
+				}
+			}
+		}
+	}
+	
+	function createRegistry($userID, $registryName, $isEditOk, $isPrivate) {
+		try {
+			if (trim($registryName) == "") {
+				return false;
+			} else {
+				$dbhost = "gastonpesa.com";
+				$dbuser = "gooby200_admin";
+				$dbpass = "5zN&EH=6ztg4";
+				$dbname = "gooby200_giftregistry";
+				
+				$registryID = "-1";
+				
+				$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+				
+				$stmt = mysqli_prepare($link, "INSERT INTO Registries VALUES (NULL, ?, ?, ?, ?)");
+				mysqli_stmt_bind_param($stmt, 'ssss', $userID, $registryName, $isEditOk, $isPrivate);
+				mysqli_stmt_execute($stmt);
+				mysqli_stmt_store_result($stmt);
+				$registryID = mysqli_stmt_insert_id($stmt);
+				
+				$stmt = mysqli_prepare($link, "INSERT INTO RegistryAssociations VALUES (NULL, ?, ?)");
+				mysqli_stmt_bind_param($stmt, 'ss', $userID, $registryID);
+				mysqli_stmt_execute($stmt);
+				
+				return true;
+			}
+		} catch (Exception $ex) {
+			return false;
+		}
+	}
+	
 	function getBirthDate($userID) {
 		try {
 			$dbhost = "gastonpesa.com";
