@@ -1,4 +1,57 @@
 <?php	
+
+	function checkRegistryAssociation($userID, $registryID) {
+		try {			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT * FROM RegistryAssociations WHERE UserID=? AND RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 'ss', $userID, $registryID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			$result = mysqli_stmt_num_rows($stmt);
+				
+			if ($result == 1) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception $ex) {
+			return false;
+		}
+	}
+
+	function getBelongRegistries($userID) {
+		try {
+			$registries = "";
+			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT Registries.RegistryName, Registries.RegistryID FROM Registries, RegistryAssociations WHERE Registries.RegistryID=RegistryAssociations.RegistryID AND RegistryAssociations.UserID=?");
+			mysqli_stmt_bind_param($stmt, 's', $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $registryName, $registryID);
+				
+			while (mysqli_stmt_fetch($stmt)) {
+				$registryName = trim($registryName);
+				$registries = "$registries <option value=\"$registryID\">$registryName</option>\r\n";
+			}
+			
+			return $registries;
+		} catch (Exception $ex) {
+			return "";
+		}
+	}
 	
 	function changePassword($userID, $email, $currentPassword, $newPassword) {
 		if (trim($email) == "" || trim($currentPassword) == "" || trim($newPassword) == "") {
@@ -119,6 +172,97 @@
 			if ($result == 1) {
 				while (mysqli_stmt_fetch($stmt)) {
 					return $birthDate;
+				}
+			} else {
+				return "";
+			}
+		} catch (Exception $ex) {
+			echo $ex;
+			return "";
+		}
+	}
+	
+	function canEditRegistry($registryID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT EditOk FROM Registries WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $canEdit);
+			$result = mysqli_stmt_num_rows($stmt);
+			if ($result == 1) {
+				if (mysqli_stmt_fetch($stmt)) {
+					if ($canEdit == "1") {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+			return false;
+		} catch (Exception $ex) {
+			echo $ex;
+			return false;
+		}
+	}
+	
+	function isRegistryPrivate($registryID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT Private FROM Registries WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $isPrivate);
+			$result = mysqli_stmt_num_rows($stmt);
+			if ($result == 1) {
+				if (mysqli_stmt_fetch($stmt)) {
+					if ($isPrivate == "1") {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+			return false;
+		} catch (Exception $ex) {
+			echo $ex;
+			return false;
+		}
+	}
+	
+	function getRegistryName($registryID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT RegistryName FROM Registries WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $registryName);
+			$result = mysqli_stmt_num_rows($stmt);
+			if ($result == 1) {
+				while (mysqli_stmt_fetch($stmt)) {
+					return $registryName;
 				}
 			} else {
 				return "";

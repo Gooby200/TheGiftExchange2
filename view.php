@@ -4,6 +4,21 @@
 		destroySession();
 	}
 	
+	$lstRegistriesOptions = getBelongRegistries($_SESSION["userID"]);
+	
+	//work on this later
+	$lstInvitesOptions = "";
+	
+	if ($lstInvitesOptions == "") {
+		$lstInviteStyle = 'style="display: none;"';
+	}
+	
+	if (isset($_POST["btnGo"])) {
+		if (isset($_POST["lstRegistries"]) && $_POST["lstRegistries"] != "") {
+			header("Location: registry.php?id=" . $_POST["lstRegistries"]);
+		}
+	}
+	
 ?>
 <html>
 	<head>
@@ -36,22 +51,26 @@
 		</div>
 		<div class="col-lg-3 form-wrapper">
 			<p class="modal-header"><strong>View registries and invites</strong></p>
-			<div class="input-group form-text">
-				<select name="lstRegistries" class="form-control">
-					<?php echo $lstRegistriesOptions; ?>
-				</select>
-				<span class="input-group-btn" style="min-width: 111px;">
-					<input type="submit" name="btnGo" value="View Registry" class="btn btn-md btn-success btn-block" />
-				</span>
-			</div>
-			<div class="input-group">
-				<select name="lstInvites" class="form-control">
-					<?php echo $lstInvitesOptions; ?>
-				</select>
-				<span class="input-group-btn" style="min-width: 111px;">
-					<input type="submit" name="btnViewInvite" value="View Invite" class="btn btn-md btn-success btn-block" />
-				</span>
-			</div>
+			<form method="post" action="view.php">
+				<div class="input-group form-text">
+					<select name="lstRegistries" class="form-control">
+						<?php echo $lstRegistriesOptions; ?>
+					</select>
+					<span class="input-group-btn" style="min-width: 111px;">
+						<input type="submit" name="btnGo" value="View Registry" class="btn btn-md btn-success btn-block" />
+					</span>
+				</div>
+			</form>
+			<form method="post" action="view.php" <?php echo $lstInviteStyle; ?>>
+				<div class="input-group">
+					<select name="lstInvites" class="form-control">
+						<?php echo $lstInvitesOptions; ?>
+					</select>
+					<span class="input-group-btn" style="min-width: 111px;">
+						<input type="submit" name="btnViewInvite" value="View Invite" class="btn btn-md btn-success btn-block" />
+					</span>
+				</div>
+			</form>
 		</div>
 	</body>
 	<footer>
