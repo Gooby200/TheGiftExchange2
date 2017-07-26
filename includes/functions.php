@@ -25,14 +25,18 @@
 						$correctCredentials = true;
 					}
 				}
-				
+								
 				if ($correctCredentials) {
+					$newPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+					
 					$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE UserID=? AND Email=?");
-					mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $email);
+					mysqli_stmt_bind_param($stmt, 'sss', $newPassword, $userID, $email);
 					mysqli_stmt_execute($stmt);
+					
+					return true;
+				} else {
+					return false;
 				}
-				
-				return true;
 			} catch (Exception $ex) {
 				return false;
 			}
