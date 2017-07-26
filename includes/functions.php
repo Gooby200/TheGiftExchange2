@@ -20,7 +20,7 @@
 				mysqli_stmt_store_result($stmt);
 				mysqli_stmt_bind_result($stmt, $hashPass);
 				
-				while (mysqli_stmt_fetch($stmt)) {
+				if (mysqli_stmt_fetch($stmt)) {
 					if (password_verify($currentPassword, $hashPass)) {
 						$correctCredentials = true;
 					}
@@ -28,7 +28,7 @@
 				
 				if ($correctCredentials) {
 					$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE UserID=? AND Email=?");
-					mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $);
+					mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $email);
 					mysqli_stmt_execute($stmt);
 				}
 				
@@ -187,8 +187,11 @@
 			$dbname = "gooby200_giftregistry";
 			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 			
-			$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE Email=?");
+			$newPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+			
+			$stmt = mysqli_prepare($link, "UPDATE Users SET Password=?, PasswordResetToken=NULL WHERE Email=?");
 			mysqli_stmt_bind_param($stmt, 'ss', $newPassword, $email);
+						
 			return mysqli_stmt_execute($stmt);
 		} catch (Exception $ex) {
 			echo $ex;
@@ -198,6 +201,10 @@
 	
 	function verifyTokenInformation($email, $token) {
 		try {
+			if (trim($token) == "" || $token == null) {
+				return false;
+			}
+			
 			$dbhost = "gastonpesa.com";
 			$dbuser = "gooby200_admin";
 			$dbpass = "5zN&EH=6ztg4";
