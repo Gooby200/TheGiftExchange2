@@ -3,11 +3,16 @@
 
 	
 	$registryID = $_GET["id"];
-	
+	$tableRows = "";
 	
 	$registryName = "";
 	
 	if (trim($registryID) != "" && $registryID != null) {
+		
+		if (doesRegistryExist($registryID) == false) {
+			header("Location: view.php");
+		}
+		
 		$registryName = getRegistryName($registryID);
 		$isPrivate = isRegistryPrivate($registryID);
 		
@@ -25,8 +30,12 @@
 				header("Location: view.php");
 			}
 			
+			//display the items if we haven't been kicked out yet due to permissions
+			$tableRows = getRegistryItems($registryID);
+			
 		} else {
 			//if its not private, anyone can view this registry and doesn't have to be logged in
+			$tableRows = getRegistryItems($registryID);
 		}
 	} else {
 		header("Location: view.php");
@@ -48,6 +57,16 @@
 			$(document).ready(function(){
 				$('[data-toggle="tooltip"]').tooltip(); 
 			});
+			
+			function numberChange(itemID) {
+				if ($("#totalBought" + itemID).val() != $("#totalBought" + itemID).prop("min")) {
+					//show the update button
+					//show the update column
+				} else {
+					//hide the update button
+					//check to see if the other buttons are invisible. if they are, hide update column. if not, keep it displayed
+				}
+			}
 		</script>
 	</head>
 	<body>
@@ -81,9 +100,9 @@
 						<th>Image</th>
 						<th>Need</th>
 						<th>Bought</th>
-						<th>Update</th>
+						<th style="display: none;">Update</th>
 					</tr>
-					<?php $tableRows; ?>
+					<?php echo $tableRows; ?>
 				</table>
 			</div>
 		</div>
