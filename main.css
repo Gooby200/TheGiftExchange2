@@ -171,3 +171,9 @@ footer {
 .red {
     color: red;
 }
+
+.updateButton {
+	margin-top: 10px;
+	color: red;
+	font-weight: bold;
+}

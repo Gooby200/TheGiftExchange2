@@ -16,7 +16,7 @@
 	if (isset($_GET["email"]) && isset($_GET["token"])) {
 		$email = $_GET["email"];
 		$token = $_GET["token"];
-		
+				
 		if (($email != null || $email != "") && ($token != null || $token != "")) {
 			if (verifyTokenInformation($email, $token)) {
 				$emailPasswordStyle = 'style="display: none;"';
@@ -32,6 +32,11 @@
 	}
 	
 	if (isset($_POST["btnReset"])) {
+		if (isset($_POST["hEmail"]) && isset($_POST["hToken"])) {
+			$email = $_POST["hEmail"];
+			$token = $_POST["hToken"];
+		}
+		
 		if (($email != null || $email != "") && ($token != null || $token != "")) {
 			if (isset($_POST["txtPassword"]) && isset($_POST["txtConfPass"])) {
 				if (($_POST["txtPassword"] != null || trim($_POST["txtPassword"]) != "") && ($_POST["txtConfPass"] != null || trim($_POST["txtConfPass"]) != "")) {
@@ -86,6 +91,8 @@
 		<div name="pnlPasswordReset" class="col-lg-3 form-wrapper" <?php echo $pwResetStyle; ?>>
 			<form method="post" action="forgotpassword.php">
 				<p class="modal-header"><strong>Password reset</strong></p>
+				<input type="hidden" name="hEmail" value="<?php echo $email; ?>" />
+				<input type="hidden" name="hToken" value="<?php echo $token; ?>" />
 				<input type="password" name="txtPassword" placeholder="Password" class="form-control form-text" required />
 				<input type="password" name="txtConfPass" placeholder="Confirm Password" class="form-control form-text" required />
 				<input type="submit" name="btnReset" value="Reset Password" class="btn btn-md btn-success btn-block" />
