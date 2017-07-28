@@ -28,7 +28,7 @@
 				
 				if ($correctCredentials) {
 					$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE UserID=? AND Email=?");
-					mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $);
+					//mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $);
 					mysqli_stmt_execute($stmt);
 				}
 				
