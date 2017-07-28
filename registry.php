@@ -4,6 +4,7 @@
 	
 	$registryID = $_GET["id"];
 	$tableRows = "";
+	$userNavigation = "";
 	
 	$registryName = "";
 	
@@ -35,6 +36,25 @@
 			
 		} else {
 			//if its not private, anyone can view this registry and doesn't have to be logged in
+			if (isLoggedIn()) {
+				$userNavigation = "	<div class=\"col-lg-offset-2\">
+										<ul>
+											<li><a id=\"lnkHome\" href=\"home.php\">Home</a></li>
+											<li><a id=\"lnkView\" href=\"view.php\">View</a></li>
+											<li><a id=\"lnkCreate\" href=\"create.php\">Create</a></li>
+											<li><a id=\"lnkAccount\" href=\"account.php\">Account</a></li>
+											<li><a id=\"lnkAboutMe\" href=\"about.php\">About Me</a></li>
+											<li><a id=\"lnkLogout\" href=\"logout.php\">Logout</a></li>
+										</ul>
+									</div>";
+			} else {
+				$userNavigation = "<div class=\"col-lg-offset-7\">
+										<ul>
+											<li><a id=\"lnkRegister\" href=\"register.php\">Register</a></li>
+											<li><a id=\"lnkLogin\" href=\"#\">Login</a></li>
+										</ul>
+									</div>";
+			}
 			$tableRows = getRegistryItems($registryID);
 		}
 	} else {
@@ -61,26 +81,20 @@
 			function numberChange(itemID) {
 				if ($("#totalBought" + itemID).val() != $("#totalBought" + itemID).prop("min")) {
 					//show the update button
-					//show the update column
+					$("#saveButton" + itemID).prop("style", "");
 				} else {
 					//hide the update button
-					//check to see if the other buttons are invisible. if they are, hide update column. if not, keep it displayed
+					$("#saveButton" + itemID).prop("style", "display: none;");
 				}
+				
+				//for loop here that goes through all of the bought values and sees if its their originals
+				//if it is, it will hide the update column. if its not, it will show it
 			}
 		</script>
 	</head>
 	<body>
 		<div id="navigationbar" class="clearfix">
-			<div class="col-lg-offset-2">
-				<ul>
-					<li><a id="lnkHome" href="home.php">Home</a></li>
-					<li><a id="lnkView" href="view.php">View</a></li>
-					<li><a id="lnkCreate" href="create.php">Create</a></li>
-					<li><a id="lnkAccount" href="account.php">Account</a></li>
-					<li><a id="lnkAboutMe" href="about.php">About Me</a></li>
-					<li><a id="lnkLogout" href="logout.php">Logout</a></li>
-				</ul>
-			</div>
+			<?php echo $userNavigation; ?>
 		</div>
 		<div class="col-lg-9 window-wrapper">
 			<div class="modal-header">
@@ -100,7 +114,6 @@
 						<th>Image</th>
 						<th>Need</th>
 						<th>Bought</th>
-						<th style="display: none;">Update</th>
 					</tr>
 					<?php echo $tableRows; ?>
 				</table>

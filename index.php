@@ -37,7 +37,6 @@
 				<ul>
 					<li><a id="lnkRegister" href="register.php">Register</a></li>
 					<li><a id="lnkLogin" class="active" href="#">Login</a></li>
-
 				</ul>
 			</div>
 		</div>

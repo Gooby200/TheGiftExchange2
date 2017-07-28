@@ -41,7 +41,7 @@
 					} else {
 						$productPurchasedAmount = "<input class=\"form-control\" id=\"totalBought$itemID\" style=\"min-width: 100px;\" oninput=\"numberChange($itemID);\" type=\"number\" min=\"$productPurchasedAmount\" max=\"$productAskingAmount\" value=\"$productPurchasedAmount\" />";
 						
-						$updateButton = "<input type=\"button\" value=\"Save\" id=\"saveButton$itemID\" onclick=\"save($itemID);\" style=\"display: none;\" />";
+						$updateButton = "<input type=\"button\" value=\"Save\" id=\"saveButton$itemID\" onclick=\"save($itemID);\" style=\"display: none;\" class=\"form-control updateButton\" />";
 					}
 					
 					$items = "$items <tr>
@@ -51,9 +51,9 @@
 								  <td><center>$productNotes</center></td>
 								  <td><center>$productImage</center></td>
 								  <td><center>$productAskingAmount</center></td>
-								  <td><center>$productPurchasedAmount</center></td>
-								  <td style=\"display: none;\">$updateButton</td>
+								  <td><center>$productPurchasedAmount$updateButton</center></td>
 							  </tr>";
+							  
 				}
 				
 				return $items;
