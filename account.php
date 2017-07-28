@@ -30,7 +30,6 @@
 			if ($_POST["txtNewPassword"] != $_POST["txtConfirmPassword"]) {
 				$warning2 = "Both new password fields must match.";
 			} else {
-				if (changePassword($_SESSION["userID"], $_POST["txtEmail"], $_POST["txtConfirmPassword"], $_POST["txtNewPassword"])) {
 				if (changePassword($_SESSION["userID"], $_POST["txtEmail"], $_POST["txtCurrentPassword"], $_POST["txtNewPassword"])) {
 					$warning2 = "Password reset successfully.";
 				} else {
