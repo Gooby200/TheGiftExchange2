@@ -4,10 +4,19 @@
 	
 	$registryID = $_GET["id"];
 	$tableRows = "";
-	$userNavigation = "";
+	$userNavigation = "	<div class=\"col-lg-offset-2\">
+										<ul>
+											<li><a id=\"lnkHome\" href=\"home.php\">Home</a></li>
+											<li><a id=\"lnkView\" href=\"view.php\">View</a></li>
+											<li><a id=\"lnkCreate\" href=\"create.php\">Create</a></li>
+											<li><a id=\"lnkAccount\" href=\"account.php\">Account</a></li>
+											<li><a id=\"lnkAboutMe\" href=\"about.php\">About Me</a></li>
+											<li><a id=\"lnkLogout\" href=\"logout.php\">Logout</a></li>
+										</ul>
+									</div>";
 	
 	$registryName = "";
-	
+		
 	if (trim($registryID) != "" && $registryID != null) {
 		
 		if (doesRegistryExist($registryID) == false) {
@@ -36,18 +45,7 @@
 			
 		} else {
 			//if its not private, anyone can view this registry and doesn't have to be logged in
-			if (isLoggedIn()) {
-				$userNavigation = "	<div class=\"col-lg-offset-2\">
-										<ul>
-											<li><a id=\"lnkHome\" href=\"home.php\">Home</a></li>
-											<li><a id=\"lnkView\" href=\"view.php\">View</a></li>
-											<li><a id=\"lnkCreate\" href=\"create.php\">Create</a></li>
-											<li><a id=\"lnkAccount\" href=\"account.php\">Account</a></li>
-											<li><a id=\"lnkAboutMe\" href=\"about.php\">About Me</a></li>
-											<li><a id=\"lnkLogout\" href=\"logout.php\">Logout</a></li>
-										</ul>
-									</div>";
-			} else {
+			if (!isLoggedIn()) {
 				$userNavigation = "<div class=\"col-lg-offset-7\">
 										<ul>
 											<li><a id=\"lnkRegister\" href=\"register.php\">Register</a></li>
@@ -55,6 +53,7 @@
 										</ul>
 									</div>";
 			}
+			
 			$tableRows = getRegistryItems($registryID);
 		}
 	} else {
@@ -86,9 +85,35 @@
 					//hide the update button
 					$("#saveButton" + itemID).prop("style", "display: none;");
 				}
-				
-				//for loop here that goes through all of the bought values and sees if its their originals
-				//if it is, it will hide the update column. if its not, it will show it
+			}
+			
+			function save(itemID, registryID) {
+				$.ajax({
+					type: "POST",
+					url: "includes/functions.php",
+					data: {
+						action: "UpdateAmount",
+						itemID: itemID,
+						amount: $("#totalBought" + itemID).val(),
+						registryID: registryID,
+						currentAmount: $("#totalBought" + itemID).prop("min")
+					},
+					success: function(data) {
+						if (data == 1) {
+							$("#saveButton" + itemID).prop("style", "display: none;");
+							$("#totalBought" + itemID).prop("min", $("#totalBought" + itemID).val());
+							
+							if ($("#totalBought" + itemID).val() == $("#totalBought" + itemID).prop("max")) {
+								$("#asking" + itemID).replaceWith("<strong><span style=\"color: green;\">" + $("#totalBought" + itemID).val() + "</span></strong>");
+								$("#totalBought" + itemID).replaceWith("<strong><span style=\"color: green;\">" + $("#totalBought" + itemID).val() + "</span></strong>");
+							}
+						} else if (data == -1) {
+							alert("This item has already been updated. Please refresh the page.");
+						} else if (data == -2) {
+							alert("An error occured.");
+						}
+					}
+				});
 			}
 		</script>
 	</head>

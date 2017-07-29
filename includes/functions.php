@@ -1,4 +1,46 @@
 <?php	
+	
+	if (isset($_POST["action"]) && !empty($_POST["action"])) {
+		
+		$action = $_POST["action"];
+		
+		if ($action == "UpdateAmount") {
+			if (isset($_POST["itemID"]) && !empty($_POST["itemID"]) && isset($_POST["amount"]) && !empty($_POST["amount"]) && isset($_POST["registryID"]) && !empty($_POST["registryID"])) {
+				$itemID = $_POST["itemID"];
+				$amount = $_POST["amount"];
+				$registryID = $_POST["registryID"];
+				$currentAmount = $_POST["currentAmount"];
+							
+				echo updateRegistryItemAmount($registryID, $itemID, $amount, $currentAmount);
+			}
+		}
+	}
+	
+	function updateRegistryItemAmount($registryID, $itemID, $amount, $currentAmount) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "UPDATE RegistryItem SET PurchasedAmount=? WHERE ItemID=? AND RegistryID=? AND PurchasedAmount=?");
+			mysqli_stmt_bind_param($stmt, 'ssss', $amount, $itemID, $registryID, $currentAmount);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			$result = mysqli_stmt_affected_rows($stmt);
+			
+			if ($result > 0) {
+				return 1;
+			} else {
+				return -1;
+			}
+		} catch (Exception $ex) {
+			return -2;
+		}
+	}
+
 	function getRegistryItems($registryID) {
 		try {
 			$dbhost = "gastonpesa.com";
@@ -41,11 +83,13 @@
 					} else {
 						$productPurchasedAmount = "<input class=\"form-control\" id=\"totalBought$itemID\" style=\"min-width: 100px;\" oninput=\"numberChange($itemID);\" type=\"number\" min=\"$productPurchasedAmount\" max=\"$productAskingAmount\" value=\"$productPurchasedAmount\" />";
 						
-						$updateButton = "<input type=\"button\" value=\"Save\" id=\"saveButton$itemID\" onclick=\"save($itemID);\" style=\"display: none;\" class=\"form-control updateButton\" />";
+						$updateButton = "<input type=\"button\" value=\"Save\" id=\"saveButton$itemID\" onclick=\"save($itemID, $registryID);\" style=\"display: none;\" class=\"form-control updateButton\" />";
+						
+						$productAskingAmount = "<span id=\"asking$itemID\">$productAskingAmount</span>";
 					}
 					
 					$items = "$items <tr>
-								  <td><center>$lastName, $firstName</center></td>
+								  <td>$lastName, $firstName</td>
 								  <td><a href=\"$productLocation\" target=\"_blank\">$productName</a></td>
 								  <td><center>$productPrice</center></td>
 								  <td><center>$productNotes</center></td>
@@ -174,11 +218,7 @@
 					$newPassword = password_hash($newPassword, PASSWORD_BCRYPT);
 					
 					$stmt = mysqli_prepare($link, "UPDATE Users SET Password=? WHERE UserID=? AND Email=?");
-<<<<<<< HEAD
-					//mysqli_stmt_bind_param($stmt, 'sss', password_hash($newPassword, PASSWORD_BCRYPT), $userID, $);
-=======
 					mysqli_stmt_bind_param($stmt, 'sss', $newPassword, $userID, $email);
->>>>>>> 0d40b21792bb9b7420f0c024453b8ee0841e5155
 					mysqli_stmt_execute($stmt);
 					
 					return true;
