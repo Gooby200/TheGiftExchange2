@@ -4,8 +4,12 @@
 		header("Location: home.php");
 	}
 	
+	$result = "";
+	
 	if (isset($_POST["btnRegister"])) {
-		if (registerAccount($_POST["txtUsername"], $_POST["txtFirstName"], $_POST["txtLastName"], $_POST["txtDate"], $_POST["txtEmail"], $_POST["txtPassword"])) {
+		$result = registerAccount($_POST["txtUsername"], $_POST["txtFirstName"], $_POST["txtLastName"], $_POST["txtDate"], $_POST["txtEmail"], $_POST["txtPassword"]);
+				
+		if ($result == "true") {
 			$userID = verifyAccount($_POST["txtUsername"], $_POST["txtPassword"]);
 			successfulLogin($userID);
 		}
@@ -52,6 +56,7 @@
 				<input name="txtConfPass" type="password" class="form-control form-text" placeholder="Confirm Password" required />
 				<input type="submit" name="btnRegister" value="Register" class="btn btn-md btn-success btn-block" />
 			</form>
+			<span style="color: red; font-weight: bold;"><?php echo $result; ?></span>
 		</div>
 	</body>
 	<footer>

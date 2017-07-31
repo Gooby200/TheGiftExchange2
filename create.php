@@ -6,7 +6,10 @@
 	
 	if (isset($_POST["btnCreate"])) {
 		if (isset($_POST["txtRegistryName"])) {
-			createRegistry($_SESSION["userID"], $_POST["txtRegistryName"], isset($_POST["chkEditRegistry"]), isset($_POST["chkBoxPrivate"]));
+			$result = createRegistry($_SESSION["userID"], $_POST["txtRegistryName"], isset($_POST["chkEditRegistry"]), isset($_POST["chkBoxPrivate"]));
+			if ($result != "false" && $result != "-1") {
+				header("Location: registry.php?id=$result");
+			}
 		}
 	}
 	
@@ -44,10 +47,13 @@
 			<form method="post" action="create.php">
 				<p class="modal-header"><strong>Name your registry</strong></p>
 				<input type="text" name="txtRegistryName" placeholder="Registry Name" class="form-control form-text" />
-				<div class="checkbox">
-					<label class="form-text"><input type="checkbox" value="" name="chkEditRegistry" runat="server" />Can others add to this registry?</label><br />
-					<label class="form-text"><input type="checkbox" value="" name="chkBoxPrivate" runat="server" />Is this registry private?</label>
-				</div>
+				<fieldset>
+					<legend>Who can see this registry?</legend>
+						<label class="form-text"><input type="radio" name="viewPermission" value="0" />Anyone</label>
+						<label class="form-text"><input type="radio" name="viewPermission" value="1" />Any Logged In User</label>
+						<label class="form-text"><input type="radio" name="viewPermission" value="2" />Only Invited Members</label>
+						<label class="form-text"><input type="radio" name="viewPermission" value="3" />Admins Only</label>
+				</fieldset>
 				<input type="submit" name="btnCreate" value="Create" class="btn btn-md btn-success btn-block" />
 			</form>
 		</div>

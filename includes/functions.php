@@ -5,14 +5,66 @@
 		$action = $_POST["action"];
 		
 		if ($action == "UpdateAmount") {
-			if (isset($_POST["itemID"]) && !empty($_POST["itemID"]) && isset($_POST["amount"]) && !empty($_POST["amount"]) && isset($_POST["registryID"]) && !empty($_POST["registryID"])) {
+			if (isset($_POST["itemID"]) && $_POST["itemID"] != null && trim($_POST["itemID"]) != "" && isset($_POST["amount"]) && $_POST["amount"] != null && trim($_POST["amount"]) != ""  && isset($_POST["registryID"]) && $_POST["registryID"] != null && trim($_POST["registryID"]) != "") {
 				$itemID = $_POST["itemID"];
 				$amount = $_POST["amount"];
 				$registryID = $_POST["registryID"];
 				$currentAmount = $_POST["currentAmount"];
 							
-				echo updateRegistryItemAmount($registryID, $itemID, $amount, $currentAmount);
+				echo updateRegistryItemAmount($registryID, $itemID, $amount, $currentAmount) + "aa";
 			}
+		}
+	}
+	
+	function isUserOwner($registryID, $userID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+						
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			$stmt = mysqli_prepare($link, "SELECT * FROM Registries WHERE RegistryID=? AND UserID=?");
+			mysqli_stmt_bind_param($stmt, 'ss', $registryID, $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			$result = mysqli_stmt_num_rows($stmt);
+				
+			if ($result == 1) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception $ex) {
+			return false;
+		}
+	}
+	
+	function createRegistryItem($registryID, $userID, $productName, $productLocation, $productPrice, $notes, $productImage, $askingAmount) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+						
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$registryID = htmlentities($registryID);
+			$userID = htmlentities($userID);
+			$productName = htmlentities($productName);
+			$productLocation = htmlentities($productLocation);
+			$productPrice = htmlentities($productPrice);
+			$notes = htmlentities($notes);
+			$productImage = htmlentities($productImage);
+			$askingAmount = htmlentities($askingAmount);
+			
+			$stmt = mysqli_prepare($link, "INSERT INTO RegistryItem (RegistryID, UserID, ProductName, ProductLocation, ProductPrice, Notes, ProductImage, AskingAmount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+			mysqli_stmt_bind_param($stmt, 'ssssssss', $registryID, $userID, $productName, $productLocation, $productPrice, $notes, $productImage, $askingAmount);
+			mysqli_stmt_execute($stmt);
+			
+			return true;
+		} catch (Exception $ex) {
+			return false;
 		}
 	}
 	
@@ -25,6 +77,8 @@
 			
 			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 			
+			$amount = htmlentities($amount);
+			
 			$stmt = mysqli_prepare($link, "UPDATE RegistryItem SET PurchasedAmount=? WHERE ItemID=? AND RegistryID=? AND PurchasedAmount=?");
 			mysqli_stmt_bind_param($stmt, 'ssss', $amount, $itemID, $registryID, $currentAmount);
 			mysqli_stmt_execute($stmt);
@@ -36,6 +90,7 @@
 			} else {
 				return -1;
 			}
+			return -3;
 		} catch (Exception $ex) {
 			return -2;
 		}
@@ -50,11 +105,11 @@
 			
 			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 			
-			$stmt = mysqli_prepare($link, "SELECT Users.FirstName, Users.LastName, RegistryItem.ItemID, RegistryItem.ProductName, RegistryItem.ProductLocation, RegistryItem.ProductPrice, RegistryItem.Notes, RegistryItem.ProductImage, RegistryItem.AskingAmount, RegistryItem.PurchasedAmount FROM RegistryItem, Users WHERE RegistryID=? AND Hidden=0 AND Users.UserID=RegistryItem.UserID ORDER BY RegistryItem.ItemID DESC");
+			$stmt = mysqli_prepare($link, "SELECT RegistryItem.UserID, Users.FirstName, Users.LastName, RegistryItem.ItemID, RegistryItem.ProductName, RegistryItem.ProductLocation, RegistryItem.ProductPrice, RegistryItem.Notes, RegistryItem.ProductImage, RegistryItem.AskingAmount, RegistryItem.PurchasedAmount FROM RegistryItem, Users WHERE RegistryID=? AND Hidden=0 AND Users.UserID=RegistryItem.UserID ORDER BY RegistryItem.ItemID DESC");
 			mysqli_stmt_bind_param($stmt, 's', $registryID);
 			mysqli_stmt_execute($stmt);
 			mysqli_stmt_store_result($stmt);
-			mysqli_stmt_bind_result($stmt, $firstName, $lastName, $itemID, $productName, $productLocation, $productPrice, $productNotes, $productImage, $productAskingAmount, $productPurchasedAmount);
+			mysqli_stmt_bind_result($stmt, $userID, $firstName, $lastName, $itemID, $productName, $productLocation, $productPrice, $productNotes, $productImage, $productAskingAmount, $productPurchasedAmount);
 			$result = mysqli_stmt_num_rows($stmt);
 			
 			if ($result > 0) {
@@ -85,12 +140,22 @@
 						
 						$updateButton = "<input type=\"button\" value=\"Save\" id=\"saveButton$itemID\" onclick=\"save($itemID, $registryID);\" style=\"display: none;\" class=\"form-control updateButton\" />";
 						
-						$productAskingAmount = "<span id=\"asking$itemID\">$productAskingAmount</span>";
+						$productAskingAmount = "<strong><span id=\"asking$itemID\" style=\"color: red;\">$productAskingAmount</span></strong>";
+					}
+					
+					if ($userID != "-1") {
+						$name = "$lastName, $firstName";
+					} else {
+						$name = "Unregistered User";
+					}
+					
+					if ($productLocation != "") {
+						$productName = "<a href=\"$productLocation\" target=\"_blank\">$productName</a>";
 					}
 					
 					$items = "$items <tr>
-								  <td>$lastName, $firstName</td>
-								  <td><a href=\"$productLocation\" target=\"_blank\">$productName</a></td>
+								  <td>$name</td>
+								  <td>$productName</td>
 								  <td><center>$productPrice</center></td>
 								  <td><center>$productNotes</center></td>
 								  <td><center>$productImage</center></td>
@@ -246,6 +311,10 @@
 					
 					$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 					
+					$firstName = htmlentities($firstName);
+					$lastName = htmlentities($lastName);
+					$birthDate = htmlentities($birthDate);
+					
 					$stmt = mysqli_prepare($link, "UPDATE Users SET FirstName=?, LastName=?, BirthDate=? WHERE UserID=?");
 					mysqli_stmt_bind_param($stmt, 'ssss', $firstName, $lastName, $birthDate, $userID);
 					mysqli_stmt_execute($stmt);
@@ -273,6 +342,8 @@
 				
 				$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 				
+				$registryName = htmlentities($registryName);
+				
 				$stmt = mysqli_prepare($link, "INSERT INTO Registries VALUES (NULL, ?, ?, ?, ?)");
 				mysqli_stmt_bind_param($stmt, 'ssss', $userID, $registryName, $isEditOk, $isPrivate);
 				mysqli_stmt_execute($stmt);
@@ -283,7 +354,7 @@
 				mysqli_stmt_bind_param($stmt, 'ss', $userID, $registryID);
 				mysqli_stmt_execute($stmt);
 				
-				return true;
+				return $registryID;
 			}
 		} catch (Exception $ex) {
 			return false;
@@ -317,7 +388,7 @@
 		}
 	}
 	
-	function canEditRegistry($registryID) {
+	function registryAddItemPermission($registryID) {
 		try {
 			$dbhost = "gastonpesa.com";
 			$dbuser = "gooby200_admin";
@@ -333,23 +404,19 @@
 			$result = mysqli_stmt_num_rows($stmt);
 			if ($result == 1) {
 				if (mysqli_stmt_fetch($stmt)) {
-					if ($canEdit == "1") {
-						return true;
-					} else {
-						return false;
-					}
+					return $canEdit;
 				}
 			} else {
-				return false;
+				return -1;
 			}
-			return false;
+			return -1;
 		} catch (Exception $ex) {
 			echo $ex;
-			return false;
+			return -1;
 		}
 	}
 	
-	function isRegistryPrivate($registryID) {
+	function registryPrivatePermission($registryID) {
 		try {
 			$dbhost = "gastonpesa.com";
 			$dbuser = "gooby200_admin";
@@ -365,19 +432,15 @@
 			$result = mysqli_stmt_num_rows($stmt);
 			if ($result == 1) {
 				if (mysqli_stmt_fetch($stmt)) {
-					if ($isPrivate == "1") {
-						return true;
-					} else {
-						return false;
-					}
+					return $isPrivate;
 				}
 			} else {
-				return false;
+				return -1;
 			}
-			return false;
+			return -1;
 		} catch (Exception $ex) {
 			echo $ex;
-			return false;
+			return -1;
 		}
 	}
 	
@@ -518,17 +581,22 @@
 			$dbname = "gooby200_giftregistry";
 			
 			if (trim($username) == "" || trim($password) == "") {
-				return false;
+				return "Please enter a username.";
 			} else {
 				if (doesUserAlreadyExist($username)) {
-					return false;
+					return "Username already exists.";
 				} else {
 					if (doesEmailAlreadyExist($email)) {
-						return false;
+						return "Email already exists.";
 					} else {
 						date_default_timezone_set("America/Chicago");
 						$date = date("Y/m/d H:i:s");
 						$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+						
+						$firstname = htmlentities($firstname);
+						$lastname = htmlentities($lastname);
+						$birthdate = htmlentities($birthdate);
+						$password = password_hash($password, PASSWORD_BCRYPT);
 						
 						$stmt = mysqli_prepare($link, 'INSERT INTO Users (Username, FirstName, LastName, Email, Password, CreatedDate, LastLogon, BirthDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
 						mysqli_stmt_bind_param($stmt, 'ssssssss', $username, $firstname, $lastname, $email, $password, $date, $date, $birthdate);
@@ -539,7 +607,7 @@
 			
 		} catch (Exception $ex) {
 			echo $ex;
-			return false;
+			return "An error occured.";
 		}
 	}
 	
@@ -620,6 +688,9 @@
 			$dbname = "gooby200_giftregistry";
 			
 			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			date_default_timezone_set("America/Chicago");
+			$today = date("Y/m/d H:i:s");
 			
 			$stmt = mysqli_prepare($link, "UPDATE Users SET LastLogon=? WHERE UserID=?");
 			mysqli_stmt_bind_param($stmt, 'ss', $today, $userID);

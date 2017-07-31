@@ -16,6 +16,7 @@
 									</div>";
 	
 	$registryName = "";
+	$editPermissions = "";
 		
 	if (trim($registryID) != "" && $registryID != null) {
 		
@@ -23,39 +24,135 @@
 			header("Location: view.php");
 		}
 		
+		$canView = false;
+		$canAddItems = false;
 		$registryName = getRegistryName($registryID);
-		$isPrivate = isRegistryPrivate($registryID);
+		$privateLevel = registryPrivatePermission($registryID);
+		$addItemPermissionLevel = registryAddItemPermission($registryID);
+		$isLoggedIn = isLoggedIn();
+		$userInRegistry = false;
 		
-		if ($isPrivate) {
-			//if private, check if the user is logged in because they have to be logged in to view
-			if (!isLoggedIn()) {
-				destroySession();
-			}
+		
+		
+		//if the user isn't logged in, destroy any session data and give guest navigation
+		if ($isLoggedIn == false) {
+			session_destroy();
 			
-			//since the user is logged in by this point, get their user id
-			$userID = $_SESSION["userID"];
-			
-			//check the association of the user against the registry and see if the user is part of it
-			if (checkRegistryAssociation($userID, $registryID) == false) {
-				header("Location: view.php");
-			}
-			
-			//display the items if we haven't been kicked out yet due to permissions
-			$tableRows = getRegistryItems($registryID);
-			
-		} else {
-			//if its not private, anyone can view this registry and doesn't have to be logged in
-			if (!isLoggedIn()) {
-				$userNavigation = "<div class=\"col-lg-offset-7\">
+			$userNavigation = "<div class=\"col-lg-offset-7\">
 										<ul>
 											<li><a id=\"lnkRegister\" href=\"register.php\">Register</a></li>
-											<li><a id=\"lnkLogin\" href=\"#\">Login</a></li>
+											<li><a id=\"lnkLogin\" href=\"index.php\">Login</a></li>
 										</ul>
 									</div>";
-			}
 			
-			$tableRows = getRegistryItems($registryID);
+			//give the guest a temporary user id of -1 so that they can post to registry
+			$userID = -1;
+		} else {
+			//set the user id if the user is logged in
+			$userID = $_SESSION["userID"];
 		}
+		
+		//check to see if the user is assocaited in the registry
+		if ($isLoggedIn && checkRegistryAssociation($userID, $registryID)) {
+			$userInRegistry = true;
+		}
+		
+		//the owner of the registry will always be able to view registry and add items
+		if ($isLoggedIn && isUserOwner($registryID, $userID)) {
+			$canView = true;
+			$canAddItems = true;
+		}
+		
+		//check to see if the user can view the registry based on registry permissions
+		if ($privateLevel == 0 || ($privateLevel == 1 && $isLoggedIn) || ($privateLevel == 2 && $isLoggedIn && $userInRegistry)) {
+			$canView = true;
+		}
+		
+		//by this point, the user is viewing the registry, check to see if the user can add items to registry
+		if ($addItemPermissionLevel == 0 || ($addItemPermissionLevel == 1 && $isLoggedIn) || ($addItemPermissionLevel == 2 && $isLoggedIn && $userInRegistry)) {
+			$canAddItems = true;
+		}		
+		
+		//allow the user to add items by dispalying them the add button
+		if ($canAddItems) {
+			$editPermissions = "<input type=\"button\" name=\"btnAddEntry\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#myModal\" value=\"Add Entry\" />";
+		}
+		
+		//check to see if the user is actually trying to add an item
+		if ($canAddItems) {
+			if (isset($_POST["btnAddEntry"])) {
+				createRegistryItem($registryID, $userID, $_POST["txtProductName"], $_POST["txtProductLink"], $_POST["txtProductPrice"], $_POST["txtNotes"], $_POST["txtProductImageURL"], $_POST["txtNeed"]);
+			}
+		}
+		
+		//handle showing registry by permissions
+		if ($canView) {
+			//show registry
+			$tableRows = getRegistryItems($registryID);
+		} else {
+			header("Location: view.php");
+		}
+				
+				
+		// if ($isPrivate) {
+			// //if private, check if the user is logged in because they have to be logged in to view
+			// if (!isLoggedIn()) {
+				// destroySession();
+			// }
+			
+			// //since the user is logged in by this point, get their user id
+			// $userID = $_SESSION["userID"];
+			
+			// //check the association of the user against the registry and see if the user is part of it
+			// if (checkRegistryAssociation($userID, $registryID) == false) {
+				// header("Location: view.php");
+			// }
+			
+			// if ($canEditRegistry == true || ($canEditRegistry == false && isUserOwner($registryID, $userID))) {
+				// $editPermissions = "<input type=\"button\" name=\"btnAddEntry\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#myModal\" value=\"Add Entry\" />";
+			// }
+			
+			// //add a registry item before displaying
+			// if (isset($_POST["btnAddEntry"]) && ($canEditRegistry == true || ($canEditRegistry == false && isUserOwner($registryID, $userID)))) {
+				// createRegistryItem($registryID, $userID, $_POST["txtProductName"], $_POST["txtProductLink"], $_POST["txtProductPrice"], $_POST["txtNotes"], $_POST["txtProductImageURL"], $_POST["txtNeed"]);
+			// }
+			
+			// //display the items if we haven't been kicked out yet due to permissions
+			// $tableRows = getRegistryItems($registryID);
+			
+		// } else {
+			// if (!isLoggedIn()) {
+				// $userNavigation = "<div class=\"col-lg-offset-7\">
+										// <ul>
+											// <li><a id=\"lnkRegister\" href=\"register.php\">Register</a></li>
+											// <li><a id=\"lnkLogin\" href=\"index.php\">Login</a></li>
+										// </ul>
+									// </div>";
+				// if ($canEditRegistry == true) {
+					// $editPermissions = "<input type=\"button\" name=\"btnAddEntry\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#myModal\" value=\"Add Entry\" />";
+				// }
+				
+				// //add a registry item before displaying
+				// if (isset($_POST["btnAddEntry"]) && $canEditRegistry == true) {
+					// createRegistryItem($registryID, "-1", $_POST["txtProductName"], $_POST["txtProductLink"], $_POST["txtProductPrice"], $_POST["txtNotes"], $_POST["txtProductImageURL"], $_POST["txtNeed"]);
+				// }
+			// } else {
+				// //since the user is logged in by this point, get their user id
+				// $userID = $_SESSION["userID"];
+				
+				// if ($canEditRegistry == true || ($canEditRegistry == false && isUserOwner($registryID, $userID))) {
+					// $editPermissions = "<input type=\"button\" name=\"btnAddEntry\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#myModal\" value=\"Add Entry\" />";
+				// }
+				
+				// //add a registry item before displaying
+				// if (isset($_POST["btnAddEntry"]) && ($canEditRegistry == true || ($canEditRegistry == false && isUserOwner($registryID, $userID)))) {
+					// createRegistryItem($registryID, $userID, $_POST["txtProductName"], $_POST["txtProductLink"], $_POST["txtProductPrice"], $_POST["txtNotes"], $_POST["txtProductImageURL"], $_POST["txtNeed"]);
+				// }
+			// }
+			
+			// //if its not private, anyone can view this registry and doesn't have to be logged in
+			// $tableRows = getRegistryItems($registryID);
+		// }
 	} else {
 		header("Location: view.php");
 	}
@@ -111,6 +208,8 @@
 							alert("This item has already been updated. Please refresh the page.");
 						} else if (data == -2) {
 							alert("An error occured.");
+						} else {
+							alert("An unknown error occured.");
 						}
 					}
 				});
@@ -125,8 +224,37 @@
 			<div class="modal-header">
 				<p>
 					<strong>Registry: </strong><?php echo $registryName; ?>
-					<input type="button" name="btnAddEntry" class="btn btn-success" style="float: right;" value="Add Entry" />
+					<?php echo $editPermissions; ?>
 				</p>
+			</div>
+			
+			<!-- Modal -->
+			<div class="modal fade" id="myModal" role="dialog" data-backdrop="static">
+				<div class="modal-dialog">
+
+				<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" onclick="clearModal();">&times;</button>
+							<h4 class="modal-title"><strong>Add Items To: </strong><?php echo $registryName; ?></h4>
+						</div>
+						<form method="post" action="registry.php?id=<?php echo $registryID; ?>">
+							<div class="modal-body">
+								<input type="text"  name="txtProductName" runat="server" class="form-control form-text" placeholder="Product Name" autocomplete="off" required />
+								<input type="url" name="txtProductLink" runat="server" class="form-control form-text" placeholder="Product Link" autocomplete="off" />
+								<input type="number" name="txtProductPrice" runat="server" class="form-control form-text" placeholder="Product Price" min="0" step="any" autocomplete="off" required />
+								<textarea name="txtNotes" runat="server" placeholder="Notes" rows="2" cols="20" class="form-control form-text modal-textarea"></textarea>
+								<input type="url" name="txtProductImageURL" runat="server" class="form-control form-text" placeholder="Product Image URL" autocomplete="off" />
+								<input type="number" name="txtNeed" runat="server" class="form-control form-text" placeholder="Needed Amount" min="1" step="any" autocomplete="off" required />
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearModal();">Close</button>
+								<input type="submit" name="btnAddEntry" value="Add" class="btn btn-success" />
+							</div>
+						</form>
+					</div>
+
+				</div>
 			</div>
 			
 			<div class="table-responsive">
@@ -134,11 +262,11 @@
 					<tr>
 						<th>Name</th>
 						<th>Product</th>
-						<th>Price</th>
-						<th>Notes</th>
-						<th>Image</th>
-						<th>Need</th>
-						<th>Bought</th>
+						<th><center>Price</center></th>
+						<th><center>Notes</center></th>
+						<th><center>Image</center></th>
+						<th><center>Need</center></th>
+						<th><center>Bought</center></th>
 					</tr>
 					<?php echo $tableRows; ?>
 				</table>
