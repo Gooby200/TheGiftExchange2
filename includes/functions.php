@@ -42,7 +42,7 @@
 			
 			return true;
 		} catch (Exception $ex) {
-			echo $ex;
+			return false;
 		}
 	}
 

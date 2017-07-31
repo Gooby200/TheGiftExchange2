@@ -53,9 +53,9 @@
 		}
 		
 		$isOwner = isUserOwner($registryID, $userID);
-		
+		$belongInRegistry = checkRegistryAssociation($userID, $registryID);
 		//check to see if the user is assocaited in the registry
-		if ($isLoggedIn && checkRegistryAssociation($userID, $registryID)) {
+		if ($isLoggedIn && $belongInRegistry) {
 			$userInRegistry = true;
 		}
 		
@@ -91,11 +91,18 @@
 		
 		//handle showing registry by permissions
 		if ($canView) {
+			
+			//show view users button to people who belong in the registry
+			if ($belongInRegistry) {
+				$editPermissions = "$editPermissions<input type=\"button\" name=\"btnViewUsers\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#mdlUsers\" value=\"View Users\" />";
+			}
+			
 			//show registry
 			$tableRows = getRegistryItems($registryID);
 		} else {
 			header("Location: view.php");
 		}
+		
 	} else {
 		header("Location: view.php");
 	}
