@@ -16,6 +16,39 @@
 		}
 	}
 	
+	function updateRegistrySettings($userID, $registryID, $registryName, $editPermissionLevel, $viewPermissionLevel) {
+		try {
+			if (trim($registryName) == "") {
+				return false;
+			} else {
+				if (isUserOwner($registryID, $userID)) {
+					$dbhost = "gastonpesa.com";
+					$dbuser = "gooby200_admin";
+					$dbpass = "5zN&EH=6ztg4";
+					$dbname = "gooby200_giftregistry";
+					
+					$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+				
+					$registryName = htmlentities($registryName);
+				
+					$stmt = mysqli_prepare($link, "UPDATE Registries SET RegistryName=?, EditOk=?, Private=? WHERE RegistryID=? AND UserID=?");
+					mysqli_stmt_bind_param($stmt, 'sssss', $registryName, $editPermissionLevel, $viewPermissionLevel, $registryID, $userID);
+					mysqli_stmt_execute($stmt);
+					mysqli_stmt_store_result($stmt);
+					$result = mysqli_stmt_affected_rows($stmt);
+					
+					if ($result == 1) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			}
+		} catch (Exception $ex) {
+			return false;
+		}
+	}
+	
 	function isUserOwner($registryID, $userID) {
 		try {
 			$dbhost = "gastonpesa.com";
@@ -328,7 +361,7 @@
 		}
 	}
 	
-	function createRegistry($userID, $registryName, $isEditOk, $isPrivate) {
+	function createRegistry($userID, $registryName, $editPermissionLevel, $viewPermissionLevel) {
 		try {
 			if (trim($registryName) == "") {
 				return false;
@@ -345,7 +378,7 @@
 				$registryName = htmlentities($registryName);
 				
 				$stmt = mysqli_prepare($link, "INSERT INTO Registries VALUES (NULL, ?, ?, ?, ?)");
-				mysqli_stmt_bind_param($stmt, 'ssss', $userID, $registryName, $isEditOk, $isPrivate);
+				mysqli_stmt_bind_param($stmt, 'ssss', $userID, $registryName, $editPermissionLevel, $viewPermissionLevel);
 				mysqli_stmt_execute($stmt);
 				mysqli_stmt_store_result($stmt);
 				$registryID = mysqli_stmt_insert_id($stmt);

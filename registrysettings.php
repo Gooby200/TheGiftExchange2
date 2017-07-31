@@ -3,16 +3,48 @@
 	if (!isLoggedIn()) {
 		destroySession();
 	}
+
+	//get necessary variables
+	$registryID = $_GET["id"];	
+	$userID = $_SESSION["userID"];
+	$warning1 = "";
+	$txtRegistryName = "";
+	$viewPermission = "";
+	$addPermission = "";
+	$scripts = "";
 	
-	if (isset($_POST["btnCreate"])) {
-		if (isset($_POST["txtRegistryName"])) {
-			$result = createRegistry($_SESSION["userID"], $_POST["txtRegistryName"], $_POST["addPermission"], $_POST["viewPermission"]);
-			if ($result != "false" && $result != "-1") {
-				header("Location: registry.php?id=$result");
+	if (trim($registryID) != "" && $registryID != null) {
+		if (isUserOwner($registryID, $userID)) {
+			if (isset($_POST["btnUpdate"])) {
+				if (isset($_POST["txtRegistryName"])) {
+					//update the registry
+					if (updateRegistrySettings($userID, $registryID, $_POST["txtRegistryName"], $_POST["addPermission"], $_POST["viewPermission"])) {
+						$warning1 = "Registry successfully updated.";
+					} else {
+						$warning1 = "There was an issue updating your registry.";
+					}
+				} else {
+					$warning1 = "Registry name cannot be left blank.";
+				}
 			}
+			
+			//display the registry information
+			$txtRegistryName = getRegistryName($registryID);
+			$viewPermission = registryPrivatePermission($registryID);
+			$addPermission = registryAddItemPermission($registryID);
+			
+			$scripts = "<script>
+							var viewPermission = $viewPermission;
+							var addPermission = $addPermission;
+						</script>";
+		} else {
+			//if the user is not the owner of the registry, he doesn't have permission to view this page
+			header("Location: view.php");
 		}
+	} else {
+		//page needs a registry id to continue
+		header("Location: view.php");
 	}
-	
 ?>
 <html>
 	<head>
@@ -27,16 +59,19 @@
 		<script>
 			$(document).ready(function(){
 				$('[data-toggle="tooltip"]').tooltip(); 
+				$("input[name=viewPermission][value=" + viewPermission + "]").prop("checked", true);
+				$("input[name=addPermission][value=" + addPermission + "]").prop("checked", true);
 			});
 		</script>
 	</head>
 	<body>
+		<?php echo $scripts; ?>
 		<div id="navigationbar" class="clearfix">
 			<div class="col-lg-offset-2">
 				<ul>
 					<li><a id="lnkHome" href="home.php">Home</a></li>
 					<li><a id="lnkView" href="view.php">View</a></li>
-					<li><a id="lnkCreate" class="active" href="create.php">Create</a></li>
+					<li><a id="lnkCreate" href="create.php">Create</a></li>
 					<li><a id="lnkAccount" href="account.php">Account</a></li>
 					<li><a id="lnkAboutMe" href="about.php">About Me</a></li>
 					<li><a id="lnkLogout" href="logout.php">Logout</a></li>
@@ -44,9 +79,9 @@
 			</div>
 		</div>
 		<div class="col-lg-3 form-wrapper">
-			<form method="post" action="create.php">
-				<p class="modal-header"><strong>Name your registry</strong></p>
-				<input type="text" name="txtRegistryName" placeholder="Registry Name" class="form-control form-text" />
+			<form method="post" action="registrysettings.php?id=<?php echo $registryID; ?>">
+				<p class="modal-header"><strong>Rename your registry</strong></p>
+				<input type="text" name="txtRegistryName" placeholder="Registry Name" class="form-control form-text" value="<?php echo $txtRegistryName; ?>" />
 				<p class="modal-header"><strong>Who can see this registry?</strong></p>
 				<div class="radio">
 					<label class="form-text"><input type="radio" name="viewPermission" value="0" checked />Anyone</label>
@@ -73,8 +108,9 @@
 				<div class="radio">
 					<label class="form-text"><input type="radio" name="addPermission" value="3" checked />Admins Only</label>
 				</div>
-				<input type="submit" name="btnCreate" value="Create" class="btn btn-md btn-success btn-block" />
+				<input type="submit" name="btnUpdate" value="Update Registry Settings" class="btn btn-md btn-success btn-block" />
 			</form>
+			<span style="color: red; font-weight: bold;"><?php echo $warning1; ?></span>
 		</div>
 	</body>
 	<footer>
