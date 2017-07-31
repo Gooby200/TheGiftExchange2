@@ -2,10 +2,6 @@
 +When send password is clicked, email reset link to the email in database
 
 +add the ability for a user to invite someone into their registry via email
-+add ability underneath "can others add to this registry?" that says "can invited users add to this registry?"
-+add permissions when creating a registry that either enables or disables people who are not invited to the registry to increment the bought amount. do the same with people who aren't even logged in
-
-+create a registry settings page so that the admin can toggle permission settings for the registry and give others permissions to add items to the registry. in that page, add ability to invite others to the registry and manage the users in it
 
 0 - anyone can see
 1 - only logged in users can see

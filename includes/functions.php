@@ -16,6 +16,37 @@
 		}
 	}
 	
+	function deleteRegistry($registryID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+				
+			//remove registry
+			$stmt = mysqli_prepare($link, "DELETE FROM Registries WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			
+			//remove registry items
+			$stmt = mysqli_prepare($link, "DELETE FROM RegistryItem WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+
+			//remove registry associations
+			$stmt = mysqli_prepare($link, "DELETE FROM RegistryAssociations WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			
+			return true;
+		} catch (Exception $ex) {
+			echo $ex;
+		}
+	}
+
+	
 	function updateRegistrySettings($userID, $registryID, $registryName, $editPermissionLevel, $viewPermissionLevel) {
 		try {
 			if (trim($registryName) == "") {

@@ -28,6 +28,19 @@
 				}
 			}
 			
+			if (isset($_POST["btnRemove"])) {
+				//only the owner can delete the registry
+				if (isUserOwner($registryID, $userID)) {
+					if (deleteRegistry($registryID)) {
+						header("Location: view.php");
+					} else {
+						$warning1 = "We failed to delete the registry. Please contact support.";
+					}
+				} else {
+					$warning1 = "You are not an admin of this registry.";
+				}
+			}
+			
 			//display the registry information
 			$txtRegistryName = getRegistryName($registryID);
 			$viewPermission = registryPrivatePermission($registryID);
@@ -109,6 +122,7 @@
 					<label class="form-text"><input type="radio" name="addPermission" value="3" checked />Admins Only</label>
 				</div>
 				<input type="submit" name="btnUpdate" value="Update Registry Settings" class="btn btn-md btn-success btn-block" />
+				<input type="submit" name="btnRemove" value="Delete Registry" class="btn btn-md btn-danger btn-block" onclick="return confirm('Are you sure you want to delete this registry?')" />
 			</form>
 			<span style="color: red; font-weight: bold;"><?php echo $warning1; ?></span>
 		</div>
