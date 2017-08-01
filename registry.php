@@ -123,7 +123,7 @@
 ?>
 <html>
 	<head>
-		<title>Registry</title>
+		<title>Registry - <?php echo $registryName; ?></title>
 		
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -211,12 +211,12 @@
 						</div>
 						<form method="post" action="registry.php?id=<?php echo $registryID; ?>">
 							<div class="modal-body">
-								<input type="text"  name="txtProductName" runat="server" class="form-control form-text" placeholder="Product Name" autocomplete="off" required />
-								<input type="url" name="txtProductLink" runat="server" class="form-control form-text" placeholder="Product Link" autocomplete="off" />
-								<input type="number" name="txtProductPrice" runat="server" class="form-control form-text" placeholder="Product Price" min="0" step="any" autocomplete="off" required />
-								<textarea name="txtNotes" runat="server" placeholder="Notes" rows="2" cols="20" class="form-control form-text modal-textarea"></textarea>
-								<input type="url" name="txtProductImageURL" runat="server" class="form-control form-text" placeholder="Product Image URL" autocomplete="off" />
-								<input type="number" name="txtNeed" runat="server" class="form-control form-text" placeholder="Needed Amount" min="1" step="any" autocomplete="off" required />
+								<input type="text"  name="txtProductName" class="form-control form-text" placeholder="Product Name" autocomplete="off" required />
+								<input type="url" name="txtProductLink" class="form-control form-text" placeholder="Product Link" autocomplete="off" />
+								<input type="number" name="txtProductPrice" step="any" class="form-control form-text" placeholder="Product Price" min="0" autocomplete="off" required />
+								<textarea name="txtNotes" placeholder="Notes" rows="2" cols="20" class="form-control form-text modal-textarea"></textarea>
+								<input type="url" name="txtProductImageURL" class="form-control form-text" placeholder="Product Image URL" autocomplete="off" />
+								<input type="number" name="txtNeed" pattern="\d*" class="form-control form-text" placeholder="Needed Amount" min="1" step="any" autocomplete="off" required />
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearModal();">Close</button>
