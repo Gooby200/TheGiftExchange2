@@ -4,7 +4,7 @@
 		destroySession();
 	}
 	
-	$name = getFirstName($_SESSION["userID"]);
+	$name = getFirstName($_SESSION["userID"]);	
 ?>
 <html>
 	<head>

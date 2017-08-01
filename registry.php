@@ -70,7 +70,10 @@
 			$editPermissions = "$editPermissions<input type=\"button\" onclick=\"redirectPage($registryID);\" name=\"btnRegistrySettings\" class=\"btn btn-success\" style=\"float: right;\" value=\"Registry Settings\" />";
 			
 			//give the admin the invite options
-			//$inviteOptions = 
+			$inviteOptions = "<br />
+							<p class=\"modal-header\"><strong>Invite User</strong></p>
+							<input type=\"text\" name=\"txtInviteEmail\" id=\"txtInviteEmail\" placeholder=\"Email\" class=\"form-control form-text\" required />
+							<input type=\"button\" name=\"btnInviteUser\" onclick=\"inviteUser($registryID, $userID)\" value=\"Invite User\" class=\"btn btn-md btn-success btn-block form-text\" />";
 		}
 		
 		//check to see if the user can view the registry based on registry permissions
@@ -180,6 +183,26 @@
 					}
 				});
 			}
+			
+			function inviteUser(a, b) {
+				$.ajax({
+					type: "POST",
+					url: "includes/functions.php",
+					data: {
+						action: "InviteUser",
+						a: a,
+						b: b,
+						emailAddress: $("#txtInviteEmail").val()
+					},
+					success: function(data) {
+						if (data == 1) {
+							alert("User was invited successfully. Please refresh the page to see changes.");
+						} else {
+							alert("An error occured and the user was not invited.");
+						}
+					}
+				});
+			}
 		</script>
 		<style>
 			.btn {
@@ -249,12 +272,7 @@
 								<select class="form-control" id="acceptedUsers" name="acceptedUsers" size="5">
 									<?php echo $inviteList; ?>
 								</select>
-								<br />
-								<p class="modal-header"><strong>Invite User</strong></p>
-								<form>
-									<input type="text" name="txtInviteEmail" placeholder="Email" class="form-control form-text" required />
-									<input type="button" name="btnInviteUser" value="Invite User" class="btn btn-md btn-success btn-block form-text" />
-								</form>
+								<?php echo $inviteOptions; ?>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearModal();">Close</button>

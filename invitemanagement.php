@@ -4,28 +4,16 @@
 		destroySession();
 	}
 	
-	$lstInviteStyle = "";
-	$lstRegistriesOptions = getBelongRegistries($_SESSION["userID"]);
-	$lstInvitesOptions = getInvitedRegistries($_SESSION["userID"]);
+	$registryInvitations = getAcceptInvitedRegistries($_SESSION["userID"]);
 	
-	if ($lstInvitesOptions == "") {
-		$lstInviteStyle = 'style="display: none;"';
+	//if the user doesn't have any invitations, send them back to view.php
+	if ($registryInvitations == "") {
+		header("Location: view.php");
 	}
-	
-	if (isset($_POST["btnGo"])) {
-		if (isset($_POST["lstRegistries"]) && $_POST["lstRegistries"] != "") {
-			header("Location: registry.php?id=" . $_POST["lstRegistries"]);
-		}
-	}
-	
-	if (isset($_POST["btnViewInvite"])) {
-		header("Location: invitemanagement.php");
-	}
-	
 ?>
 <html>
 	<head>
-		<title>Home</title>
+		<title>Invitation Management</title>
 		
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -38,13 +26,22 @@
 				$('[data-toggle="tooltip"]').tooltip(); 
 			});
 		</script>
+		<style>
+			.table th, .table td { 
+				 border-top: none !important; 
+			}
+			
+			.table > tbody > tr > td {
+				 vertical-align: middle;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="navigationbar" class="clearfix">
 			<div class="col-lg-offset-2">
 				<ul>
 					<li><a id="lnkHome" href="home.php">Home</a></li>
-					<li><a id="lnkView" class="active" href="view.php">View</a></li>
+					<li><a id="lnkView" href="view.php">View</a></li>
 					<li><a id="lnkCreate" href="create.php">Create</a></li>
 					<li><a id="lnkAccount" href="account.php">Account</a></li>
 					<li><a id="lnkAboutMe" href="about.php">About Me</a></li>
@@ -53,27 +50,15 @@
 			</div>
 		</div>
 		<div class="col-lg-3 form-wrapper">
-			<p class="modal-header"><strong>View registries and invites</strong></p>
-			<form method="post" action="view.php">
-				<div class="input-group form-text">
-					<select name="lstRegistries" class="form-control">
-						<?php echo $lstRegistriesOptions; ?>
-					</select>
-					<span class="input-group-btn" style="min-width: 111px;">
-						<input type="submit" name="btnGo" value="View Registry" class="btn btn-md btn-success btn-block" />
-					</span>
-				</div>
-			</form>
-			<form method="post" action="view.php" <?php echo $lstInviteStyle; ?>>
-				<div class="input-group">
-					<select name="lstInvites" class="form-control">
-						<?php echo $lstInvitesOptions; ?>
-					</select>
-					<span class="input-group-btn" style="min-width: 111px;">
-						<input type="submit" name="btnViewInvite" value="View Invites" class="btn btn-md btn-success btn-block" />
-					</span>
-				</div>
-			</form>
+			<p class="modal-header"><strong>Invitation Management</strong></p>
+			
+			<div class="table-responsive">
+				<table class="table table-striped">
+					<tbody>
+						<?php echo $registryInvitations; ?>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</body>
 	<footer>
