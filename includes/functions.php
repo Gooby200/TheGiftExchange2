@@ -16,6 +16,91 @@
 		}
 	}
 	
+	function getInvitedRegistries($userID) {
+		try {
+			$inviteList = "";
+			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT Registries.RegistryID, Registries.RegistryName FROM Registries LEFT JOIN InvitedUsers ON InvitedUsers.RegistryID = Registries.RegistryID WHERE InvitedUsers.Email = (SELECT Users.Email FROM Users WHERE Users.UserID=?)");
+			mysqli_stmt_bind_param($stmt, 's', $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $registryID, $registryName);
+				
+			while (mysqli_stmt_fetch($stmt)) {
+				$inviteList = "$inviteList <option value=\"$registryID\">$registryName</option>\r\n";
+			}
+			
+			return $inviteList;
+		} catch (Exception $ex) {
+			return "";
+		}
+	}
+	
+	function getInvitedUsersList($registryID) {
+		try {
+			$inviteList = "";
+			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT `InvitedUsers`.`ID`, `InvitedUsers`.`Email`, `Users`.`FirstName`, `Users`.`LastName` FROM `InvitedUsers` LEFT JOIN `Users` ON `InvitedUsers`.`Email` = `Users`.`Email` WHERE `InvitedUsers`.`RegistryID`=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $id, $email, $firstName, $lastName);
+				
+			while (mysqli_stmt_fetch($stmt)) {
+				if ($firstName == null || $lastName == null || $firstName == "" || $lastName == "") {
+					$inviteList = "$inviteList <option value=\"$id\">$email</option>\r\n";
+				} else {
+					$inviteList = "$inviteList <option value=\"$id\">$firstName, $lastName ($email)</option>\r\n";
+				}
+			}
+			
+			return $inviteList;
+		} catch (Exception $ex) {
+			return "";
+		}
+	}
+	
+	function getUserList($registryID) {
+		try {
+			$userList = "";
+			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT Users.UserID, Users.FirstName, Users.LastName, Users.Email FROM Users, RegistryAssociations WHERE Users.UserID = RegistryAssociations.UserID AND RegistryAssociations.RegistryID = ?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $userID, $firstName, $lastName, $email);
+				
+			while (mysqli_stmt_fetch($stmt)) {
+				$userList = "$userList <option value=\"$userID\">$lastName, $firstName ($email)</option>\r\n";
+			}
+			
+			return $userList;
+		} catch (Exception $ex) {
+			return "";
+		}
+	}
+	
 	function deleteRegistry($registryID) {
 		try {
 			$dbhost = "gastonpesa.com";

@@ -17,6 +17,9 @@
 	
 	$registryName = "";
 	$editPermissions = "";
+	$userList = "";
+	$inviteList = "";
+	$inviteOptions = "";
 		
 	if (trim($registryID) != "" && $registryID != null) {
 		
@@ -65,6 +68,9 @@
 			$canAddItems = true;
 			
 			$editPermissions = "$editPermissions<input type=\"button\" onclick=\"redirectPage($registryID);\" name=\"btnRegistrySettings\" class=\"btn btn-success\" style=\"float: right;\" value=\"Registry Settings\" />";
+			
+			//give the admin the invite options
+			//$inviteOptions = 
 		}
 		
 		//check to see if the user can view the registry based on registry permissions
@@ -91,16 +97,22 @@
 		
 		//handle showing registry by permissions
 		if ($canView) {
-			
-			//show view users button to people who belong in the registry
-			if ($belongInRegistry) {
-				$editPermissions = "$editPermissions<input type=\"button\" name=\"btnViewUsers\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#mdlUsers\" value=\"View Users\" />";
-			}
-			
 			//show registry
 			$tableRows = getRegistryItems($registryID);
 		} else {
 			header("Location: view.php");
+		}
+		
+		//by this point, the user can already view the registry
+		
+		//check if the user is part of the registry
+		if ($belongInRegistry) {
+			//show the user list button
+			$editPermissions = "$editPermissions<input type=\"button\" name=\"btnViewUsers\" class=\"btn btn-success\" style=\"float: right;\" data-toggle=\"modal\" data-target=\"#mdlUsers\" value=\"View Users\" />";
+			
+			//show the user list and invite list to the person who belongs to this list only
+			$userList = getUserList($registryID);
+			$inviteList = getInvitedUsersList($registryID);
 		}
 		
 	} else {
@@ -209,6 +221,38 @@
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearModal();">Close</button>
 								<input type="submit" name="btnAddEntry" value="Add" class="btn btn-success" />
+							</div>
+						</form>
+					</div>
+
+				</div>
+			</div>
+			
+			<!-- view users -->
+			<div class="modal fade" id="mdlUsers" role="dialog" data-backdrop="static">
+				<div class="modal-dialog">
+
+				<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" onclick="clearModal();">&times;</button>
+							<h4 class="modal-title"><strong>Users Of: </strong><?php echo $registryName; ?></h4>
+						</div>
+						<form method="post" action="registry.php?id=<?php echo $registryID; ?>">
+							<div class="modal-body">
+								<label for="acceptedUsers">User List:</label>
+								<select class="form-control" id="acceptedUsers" name="acceptedUsers" size="5">
+									<?php echo $userList; ?>
+								</select>
+								<br />
+								<label for="invitedUsers">Invited Users:</label>
+								<select class="form-control" id="acceptedUsers" name="acceptedUsers" size="5">
+									<?php echo $inviteList; ?>
+								</select>
+								<!-- do something here about inviting users if you're an admin -->
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearModal();">Close</button>
 							</div>
 						</form>
 					</div>

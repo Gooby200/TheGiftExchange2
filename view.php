@@ -4,10 +4,9 @@
 		destroySession();
 	}
 	
+	$lstInviteStyle = "";
 	$lstRegistriesOptions = getBelongRegistries($_SESSION["userID"]);
-	
-	//work on this later
-	$lstInvitesOptions = "";
+	$lstInvitesOptions = getInvitedRegistries($_SESSION["userID"]);
 	
 	if ($lstInvitesOptions == "") {
 		$lstInviteStyle = 'style="display: none;"';
