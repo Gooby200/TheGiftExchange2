@@ -290,7 +290,7 @@
 						$productAskingAmount = "<strong><span style=\"color: green;\">$productAskingAmount</span></strong>";
 						$productPurchasedAmount = "<strong><span style=\"color: green;\">$productPurchasedAmount</span></strong>";
 					} else {
-						$productPurchasedAmount = "<input class=\"form-control\" id=\"totalBought$itemID\" style=\"min-width: 100px;\" oninput=\"numberChange($itemID);\" type=\"number\" min=\"$productPurchasedAmount\" max=\"$productAskingAmount\" value=\"$productPurchasedAmount\" />";
+						$productPurchasedAmount = "<input class=\"form-control\" id=\"totalBought$itemID\" style=\"min-width: 100px;\" oninput=\"numberChange($itemID);\" type=\"number\" pattern=\"\d*\" min=\"$productPurchasedAmount\" max=\"$productAskingAmount\" value=\"$productPurchasedAmount\" />";
 						
 						$updateButton = "<input type=\"button\" value=\"Save\" id=\"saveButton$itemID\" onclick=\"save($itemID, $registryID);\" style=\"display: none;\" class=\"form-control updateButton\" />";
 						

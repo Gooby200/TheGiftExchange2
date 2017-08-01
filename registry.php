@@ -141,12 +141,12 @@
 			}
 			
 			function numberChange(itemID) {
-				if ($("#totalBought" + itemID).val() != $("#totalBought" + itemID).prop("min")) {
+				if ($("#totalBought" + itemID).val() != $("#totalBought" + itemID).attr("min")) {
 					//show the update button
-					$("#saveButton" + itemID).prop("style", "");
+					$("#saveButton" + itemID).attr("style", "");
 				} else {
 					//hide the update button
-					$("#saveButton" + itemID).prop("style", "display: none;");
+					$("#saveButton" + itemID).attr("style", "display: none;");
 				}
 			}
 			
@@ -159,14 +159,14 @@
 						itemID: itemID,
 						amount: $("#totalBought" + itemID).val(),
 						registryID: registryID,
-						currentAmount: $("#totalBought" + itemID).prop("min")
+						currentAmount: $("#totalBought" + itemID).attr("min")
 					},
 					success: function(data) {
 						if (data == 1) {
-							$("#saveButton" + itemID).prop("style", "display: none;");
-							$("#totalBought" + itemID).prop("min", $("#totalBought" + itemID).val());
+							$("#saveButton" + itemID).attr("style", "display: none;");
+							$("#totalBought" + itemID).attr("min", $("#totalBought" + itemID).val());
 							
-							if ($("#totalBought" + itemID).val() == $("#totalBought" + itemID).prop("max")) {
+							if ($("#totalBought" + itemID).val() == $("#totalBought" + itemID).attr("max")) {
 								$("#asking" + itemID).replaceWith("<strong><span style=\"color: green;\">" + $("#totalBought" + itemID).val() + "</span></strong>");
 								$("#totalBought" + itemID).replaceWith("<strong><span style=\"color: green;\">" + $("#totalBought" + itemID).val() + "</span></strong>");
 							}
