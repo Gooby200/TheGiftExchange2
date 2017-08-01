@@ -125,6 +125,11 @@
 			mysqli_stmt_bind_param($stmt, 's', $registryID);
 			mysqli_stmt_execute($stmt);
 			
+			//remove registry invitations
+			$stmt = mysqli_prepare($link, "DELETE FROM InvitedUsers WHERE RegistryID=?");
+			mysqli_stmt_bind_param($stmt, 's', $registryID);
+			mysqli_stmt_execute($stmt);
+			
 			return true;
 		} catch (Exception $ex) {
 			return false;

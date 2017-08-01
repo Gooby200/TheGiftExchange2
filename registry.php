@@ -249,7 +249,12 @@
 								<select class="form-control" id="acceptedUsers" name="acceptedUsers" size="5">
 									<?php echo $inviteList; ?>
 								</select>
-								<!-- do something here about inviting users if you're an admin -->
+								<br />
+								<p class="modal-header"><strong>Invite User</strong></p>
+								<form>
+									<input type="text" name="txtInviteEmail" placeholder="Email" class="form-control form-text" required />
+									<input type="button" name="btnInviteUser" value="Invite User" class="btn btn-md btn-success btn-block form-text" />
+								</form>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal" onclick="clearModal();">Close</button>
