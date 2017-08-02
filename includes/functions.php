@@ -21,6 +21,166 @@
 				
 				echo inviteUser($email, $registryID, $userID);
 			}
+		} else if ($action == "ManageInvite") {
+			if (isset($_POST["a"]) && $_POST["a"] != null && trim($_POST["a"]) != "" && isset($_POST["b"]) && $_POST["b"] != null && trim($_POST["b"]) && isset($_POST["c"]) && $_POST["c"] != null && trim($_POST["c"])) {
+				$accepted = $_POST["a"];
+				$registryID = $_POST["b"];
+				$userID = $_POST["c"];
+				
+				if ($accepted == 1) {
+					echo acceptInvite($userID, $registryID);
+				} else if ($accepted == 0) {
+					echo declineInvite($userID, $registryID);
+				} else {
+					echo 0;
+				}
+			}
+		}
+	}
+	
+	function updateInvitationEmail($registryID, $token, $userID) {
+		try {
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+						
+			$stmt = mysqli_prepare($link, "UPDATE InvitedUsers SET InvitedUsers.Email=(SELECT Users.Email FROM Users WHERE Users.UserID=?) WHERE InvitedUsers.RegistryID=? AND InvitedUsers.Token=?");
+			mysqli_stmt_bind_param($stmt, 'sss', $userID, $registryID, $token);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			$result = mysqli_stmt_affected_rows($stmt);
+			
+			if ($result > 0) {
+				return true;
+			} else {
+				return false;
+			}
+			return false;
+		} catch (Exception $ex) {
+			return false;
+		}
+	}
+	
+	function verifyInvitationToken($registryID, $token) {
+		try {
+			if (trim($token) == "" || $token == null) {
+				return false;
+			}
+			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT * FROM InvitedUsers WHERE RegistryID=? AND Token=?");
+			mysqli_stmt_bind_param($stmt, 'ss', $registryID, $token);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			
+			if (mysqli_stmt_num_rows($stmt) >= 1) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception $ex) {
+			echo $ex;
+			return false;
+		}
+	}
+	
+	function sendInvitation($email, $token, $registryID, $registryName) {
+		try {
+			$to = $email;
+			$subject = "TheGiftExchange.net - New Invitation!";
+			$headers[] = 'MIME-Version: 1.0';
+			$headers[] = 'Content-type: text/html; charset=iso-8859-1';
+
+			// Additional headers
+			$headers[] = 'From: TheGiftExchange Invitations <noreply@thegiftexchange.net>';
+
+			$message = "<a href=\"http://www.thegiftexchange.net/invitemanagement.php?id=$registryID&token=$token\" target=\"_blank\">$registryName</a>";
+			
+			if (mail($to, $subject, $message, implode("\r\n", $headers))) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception $ex) {
+			return false;
+		}
+	}
+	
+	function declineInvite($userID, $registryID) {
+		try {			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			//delete the user from the invited users table
+			$stmt = mysqli_prepare($link, "DELETE FROM InvitedUsers WHERE InvitedUsers.RegistryID=? AND InvitedUsers.Email=(SELECT Users.Email FROM Users WHERE Users.UserID=?)");
+			mysqli_stmt_bind_param($stmt, 'ss', $registryID, $userID);
+			mysqli_stmt_execute($stmt);
+			
+			return 1;
+		} catch (Exception $ex) {
+			return 0;
+		}
+	}
+	
+	function acceptInvite($userID, $registryID) {
+		try {			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			//insert the user into registry associations table
+			$stmt = mysqli_prepare($link, "INSERT INTO RegistryAssociations (ID, UserID, RegistryID) VALUES (null, ?, ?)");
+			mysqli_stmt_bind_param($stmt, 'ss', $userID, $registryID);
+			mysqli_stmt_execute($stmt);
+			
+			//delete the user from the invited users table
+			$stmt = mysqli_prepare($link, "DELETE FROM InvitedUsers WHERE InvitedUsers.RegistryID=? AND InvitedUsers.Email=(SELECT Users.Email FROM Users WHERE Users.UserID=?)");
+			mysqli_stmt_bind_param($stmt, 'ss', $registryID, $userID);
+			mysqli_stmt_execute($stmt);
+			
+			return 1;
+		} catch (Exception $ex) {
+			return 0;
+		}
+	}
+	
+	function getNewInvitationCount($userID) {
+		try {			
+			$dbhost = "gastonpesa.com";
+			$dbuser = "gooby200_admin";
+			$dbpass = "5zN&EH=6ztg4";
+			$dbname = "gooby200_giftregistry";
+			
+			$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
+			
+			$stmt = mysqli_prepare($link, "SELECT COUNT(Registries.RegistryID) FROM Registries LEFT JOIN InvitedUsers ON InvitedUsers.RegistryID = Registries.RegistryID WHERE InvitedUsers.Email = (SELECT Users.Email FROM Users WHERE Users.UserID=?)");
+			mysqli_stmt_bind_param($stmt, 's', $userID);
+			mysqli_stmt_execute($stmt);
+			mysqli_stmt_store_result($stmt);
+			mysqli_stmt_bind_result($stmt, $count);
+				
+			if (mysqli_stmt_fetch($stmt)) {
+				return $count;
+			}
+			
+			return 0;
+		} catch (Exception $ex) {
+			return 0;
 		}
 	}
 	
@@ -44,8 +204,8 @@
 			while (mysqli_stmt_fetch($stmt)) {
 				$inviteList .= "<tr id=\"invite$registryID\">
 									<td>$registryName</td>
-									<td class=\"text-right\"><input type=\"button\" value=\"Accept\" class=\"btn btn-success\" onclick=\"manage(1, $registryID)\" /></td>
-									<td class=\"text-right\"><input type=\"button\" value=\"Decline\" class=\"btn btn-danger\" onclick=\"manage(0, $registryID)\" /></td>
+									<td class=\"text-right\"><input type=\"button\" value=\"Accept\" class=\"btn btn-success\" onclick=\"manage(1, $registryID, $userID)\" /></td>
+									<td class=\"text-right\"><input type=\"button\" value=\"Decline\" class=\"btn btn-danger\" onclick=\"manage(0, $registryID, $userID)\" /></td>
 								</tr>\r\n";
 			}
 			
@@ -101,12 +261,27 @@
 					$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 					
 					$token = generateToken(25);
+					$registryName = "";
 					
-					$stmt = mysqli_prepare($link, "INSERT INTO InvitedUsers (ID, RegistryID, Email, Token) VALUES (null, ?, ?, ?)");
-					mysqli_stmt_bind_param($stmt, 'sss', $registryID, $email, $token);
+					$stmt = mysqli_prepare($link, "SELECT RegistryName FROM Registries WHERE RegistryID=?");
+					mysqli_stmt_bind_param($stmt, 's', $registryID);
 					mysqli_stmt_execute($stmt);
+					mysqli_stmt_store_result($stmt);
+					mysqli_stmt_bind_result($stmt, $registryName);
+						
+					if (mysqli_stmt_fetch($stmt)) {
+						$stmt = mysqli_prepare($link, "INSERT INTO InvitedUsers (ID, RegistryID, Email, Token) VALUES (null, ?, ?, ?)");
+						mysqli_stmt_bind_param($stmt, 'sss', $registryID, $email, $token);
+						mysqli_stmt_execute($stmt);
 
-					return 1;
+						if (sendInvitation($email, $token, $registryID, $registryName)) {
+							return 1;
+						} else {
+							return -4;
+						}
+					} else {
+						return -5;
+					}
 				} else {
 					return -3;
 				}
@@ -166,7 +341,7 @@
 				if ($firstName == null || $lastName == null || $firstName == "" || $lastName == "") {
 					$inviteList = "$inviteList <option value=\"$id\">$email</option>\r\n";
 				} else {
-					$inviteList = "$inviteList <option value=\"$id\">$firstName, $lastName ($email)</option>\r\n";
+					$inviteList = "$inviteList <option value=\"$id\">$lastName, $firstName ($email)</option>\r\n";
 				}
 			}
 			
@@ -956,12 +1131,12 @@
 			
 			$_SESSION["userID"] = $userID;
 			
-			header("Location: home.php");
+			return true;
 		} catch (Exception $ex) {
-			echo $ex;
+			return false;
 		}
 	}
-		
+			
 	function verifyAccount($username, $password) {		
 		$dbhost = "gastonpesa.com";
 		$dbuser = "gooby200_admin";

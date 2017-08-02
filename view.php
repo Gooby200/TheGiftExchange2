@@ -6,9 +6,9 @@
 	
 	$lstInviteStyle = "";
 	$lstRegistriesOptions = getBelongRegistries($_SESSION["userID"]);
-	$lstInvitesOptions = getInvitedRegistries($_SESSION["userID"]);
+	$inviteCount = getNewInvitationCount($_SESSION["userID"]);
 	
-	if ($lstInvitesOptions == "") {
+	if ($inviteCount == 0) {
 		$lstInviteStyle = 'style="display: none;"';
 	}
 	
@@ -66,11 +66,8 @@
 			</form>
 			<form method="post" action="view.php" <?php echo $lstInviteStyle; ?>>
 				<div class="input-group">
-					<select name="lstInvites" class="form-control">
-						<?php echo $lstInvitesOptions; ?>
-					</select>
-					<span class="input-group-btn" style="min-width: 111px;">
-						<input type="submit" name="btnViewInvite" value="View Invites" class="btn btn-md btn-success btn-block" />
+					<span class="input-group-btn">
+						<input type="submit" name="btnViewInvite" value="<?php echo $inviteCount; ?> New Invite(s)" class="btn btn-md btn-success btn-block" />
 					</span>
 				</div>
 			</form>

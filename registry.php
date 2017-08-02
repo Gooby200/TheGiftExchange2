@@ -72,7 +72,7 @@
 			//give the admin the invite options
 			$inviteOptions = "<br />
 							<p class=\"modal-header\"><strong>Invite User</strong></p>
-							<input type=\"text\" name=\"txtInviteEmail\" id=\"txtInviteEmail\" placeholder=\"Email\" class=\"form-control form-text\" required />
+							<input type=\"email\" name=\"txtInviteEmail\" id=\"txtInviteEmail\" placeholder=\"Email\" class=\"form-control form-text\" required />
 							<input type=\"button\" name=\"btnInviteUser\" onclick=\"inviteUser($registryID, $userID)\" value=\"Invite User\" class=\"btn btn-md btn-success btn-block form-text\" />";
 		}
 		
@@ -197,6 +197,8 @@
 					success: function(data) {
 						if (data == 1) {
 							alert("User was invited successfully. Please refresh the page to see changes.");
+						} else if (data == -4) {
+							alert("The user was invited but there was a problem with sending them an email notification.");
 						} else {
 							alert("An error occured and the user was not invited.");
 						}

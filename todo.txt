@@ -6,3 +6,10 @@
 0 - anyone can see
 1 - only logged in users can see
 2 - only invited users can see
+
+
+
+
++when the user is logged in and clicks the email link, it should change their invitation email to the email they are logged in with
++when a user is logged out, it should change the email to the invitation when they login successfully - done
++when a user is logged out and they create an account, it shuold change the email on the inivtaiton to what they put

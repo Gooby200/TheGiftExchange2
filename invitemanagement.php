@@ -1,7 +1,18 @@
 <?php include 'includes/functions.php' ?>
 <?php
 	if (!isLoggedIn()) {
-		destroySession();
+		session_destroy();
+		
+		if (isset($_GET["id"]) && $_GET["id"] != null && trim($_GET["id"]) != "" && isset($_GET["token"]) && $_GET["token"] != null && trim($_GET["token"])) {
+			$registryID = $_GET["id"];
+			$token = $_GET["token"];
+			
+			header("Location: index.php?id=$registryID&token=$token");
+		} else {
+			header("Location: index.php");
+		}
+		
+		return;
 	}
 	
 	$registryInvitations = getAcceptInvitedRegistries($_SESSION["userID"]);
@@ -25,6 +36,26 @@
 			$(document).ready(function(){
 				$('[data-toggle="tooltip"]').tooltip(); 
 			});
+			
+			function manage(a, b, c) {
+				$.ajax({
+					type: "POST",
+					url: "includes/functions.php",
+					data: {
+						action:  "ManageInvite",
+						a: a,
+						b: b,
+						c: c
+					},
+					success: function(data) {
+						if (data == 1) {
+							$("#invite" + b).attr("style", "display: none;");
+						} else {
+							alert("There was an error processing your request.");
+						}
+					}
+				});
+			}
 		</script>
 		<style>
 			.table th, .table td { 
