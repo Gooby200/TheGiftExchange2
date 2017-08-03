@@ -37,7 +37,7 @@
 		<div class="col-lg-8 window-wrapper">
 			<p class="modal-header"><strong>Version History</strong></p>
 			<div class="section">
-				<p class="p-header">Version 2.0 (##/##/####)</p>
+				<p class="p-header">Version 2.0 (08/01/2017)</p>
 				<ul>
 					<li>Developed new design.</li>
 					<li>Performed recoding of website logic.</li>
