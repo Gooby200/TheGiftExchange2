@@ -101,6 +101,8 @@
 
 			// Additional headers
 			$headers[] = 'From: TheGiftExchange Invitations <noreply@thegiftexchange.net>';
+			$headers[] = 'Reply-To: noreply@thegiftexchange.net';
+			$headers[] = 'X-Mailer: PHP/' . phpversion();
 
 			$message = "Greetings $email!<br />
 						<br />
@@ -110,7 +112,7 @@
 						<br />
 						If you need to create an account, <a href=\"http://www.thegiftexchange.net/register.php?id=$registryID&token=$token\" target=\"_blank\">click here</a> to register an account and associate your new account with the invitation.<br />
 						<br />
-						Best regards,
+						Best regards,<br />
 						<a href=\"http://www.thegiftexchange.net/\" target=\"_blank\">TheGiftExchange.net</a>";
 						
 			if (mail($to, $subject, $message, implode("\r\n", $headers))) {
@@ -270,13 +272,6 @@
 					$link = mysqli_connect($dbhost, $dbuser, $dbpass, $dbname);
 					
 					$token = generateToken(25);
-					$registryName = "";
-					
-					$stmt = mysqli_prepare($link, "SELECT RegistryName FROM Registries WHERE RegistryID=?");
-					mysqli_stmt_bind_param($stmt, 's', $registryID);
-					mysqli_stmt_execute($stmt);
-					mysqli_stmt_store_result($stmt);
-					mysqli_stmt_bind_result($stmt, $registryName);
 					
 					$stmt = mysqli_prepare($link, "SELECT Email FROM Users WHERE UserID=?");
 					mysqli_stmt_bind_param($stmt, 's', $userID);
@@ -289,7 +284,7 @@
 						mysqli_stmt_bind_param($stmt, 'sss', $registryID, $email, $token);
 						mysqli_stmt_execute($stmt);
 
-						if (sendInvitation($email, $token, $registryID, $registryName, $invitedBy)) {
+						if (sendInvitation($email, $token, $registryID, getRegistryName($registryID), $invitedBy)) {
 							return 1;
 						} else {
 							return -4;

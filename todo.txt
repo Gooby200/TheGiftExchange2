@@ -3,3 +3,5 @@
 +add the ability for a user to invite someone into their registry via email
 +add feature that alerts all users of a registry that someone's birthday is coming up within 2 weeks and 1 week.
 +when a user gets deleted from the database, make it so that all the pages check to see if the userid exists and if it doesn't, throw them to the index.php page. otherwise they will be able to go around all pages and make changes to registries which might be weird
++when a user invites another user, clear the invited users textbox
++add ability for admin to remove items

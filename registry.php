@@ -1,7 +1,5 @@
 <?php include 'includes/functions.php' ?>
-<?php
-
-	
+<?php	
 	$registryID = $_GET["id"];
 	$tableRows = "";
 	$userNavigation = "	<div class=\"col-lg-offset-2\">
