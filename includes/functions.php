@@ -92,7 +92,7 @@
 		}
 	}
 	
-	function sendInvitation($email, $token, $registryID, $registryName) {
+	function sendInvitation($email, $token, $registryID, $registryName, $invitedBy) {
 		try {
 			$to = $email;
 			$subject = "TheGiftExchange.net - New Invitation!";
@@ -102,8 +102,17 @@
 			// Additional headers
 			$headers[] = 'From: TheGiftExchange Invitations <noreply@thegiftexchange.net>';
 
-			$message = "<a href=\"http://www.thegiftexchange.net/invitemanagement.php?id=$registryID&token=$token\" target=\"_blank\">$registryName</a>";
-			
+			$message = "Greetings $email!<br />
+						<br />
+						You have been invited by $invitedBy to join the registry <strong>$registryName</strong>.<br />
+						<br />
+						If you already have an account, <a href=\"http://www.thegiftexchange.net/invitemanagement.php?id=$registryID&token=$token\" target=\"_blank\">click here</a> to login and associate your account with the invitation.<br />
+						<br />
+						If you need to create an account, <a href=\"http://www.thegiftexchange.net/register.php?id=$registryID&token=$token\" target=\"_blank\">click here</a> to register an account and associate your new account with the invitation.<br />
+						<br />
+						Best regards,
+						<a href=\"http://www.thegiftexchange.net/\" target=\"_blank\">TheGiftExchange.net</a>";
+						
 			if (mail($to, $subject, $message, implode("\r\n", $headers))) {
 				return true;
 			} else {
@@ -268,13 +277,19 @@
 					mysqli_stmt_execute($stmt);
 					mysqli_stmt_store_result($stmt);
 					mysqli_stmt_bind_result($stmt, $registryName);
+					
+					$stmt = mysqli_prepare($link, "SELECT Email FROM Users WHERE UserID=?");
+					mysqli_stmt_bind_param($stmt, 's', $userID);
+					mysqli_stmt_execute($stmt);
+					mysqli_stmt_store_result($stmt);
+					mysqli_stmt_bind_result($stmt, $invitedBy);
 						
 					if (mysqli_stmt_fetch($stmt)) {
 						$stmt = mysqli_prepare($link, "INSERT INTO InvitedUsers (ID, RegistryID, Email, Token) VALUES (null, ?, ?, ?)");
 						mysqli_stmt_bind_param($stmt, 'sss', $registryID, $email, $token);
 						mysqli_stmt_execute($stmt);
 
-						if (sendInvitation($email, $token, $registryID, $registryName)) {
+						if (sendInvitation($email, $token, $registryID, $registryName, $invitedBy)) {
 							return 1;
 						} else {
 							return -4;
