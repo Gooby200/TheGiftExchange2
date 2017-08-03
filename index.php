@@ -69,7 +69,7 @@
 		<div id="navigationbar" class="clearfix">
 			<div class="col-lg-offset-7">
 				<ul>
-					<li><a id="lnkRegister" href="register.php">Register</a></li>
+					<li><a id="lnkRegister" href="register.php<?php echo $invitationPost; ?>">Register</a></li>
 					<li><a id="lnkLogin" class="active" href="#">Login</a></li>
 				</ul>
 			</div>

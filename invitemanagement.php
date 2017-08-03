@@ -15,11 +15,29 @@
 		return;
 	}
 	
+	if (isset($_GET["id"]) && $_GET["id"] != null && trim($_GET["id"]) != "" && isset($_GET["token"]) && $_GET["token"] != null && trim($_GET["token"])) {
+		$registryID = $_GET["id"];
+		$token = $_GET["token"];
+		$userID = $_SESSION["userID"];
+		
+		//verify the invitation with token and id
+		if (verifyInvitationToken($registryID, $token)) {
+			//if invitation is verified, change the email of the invitation to that of the one that the user is logged in on
+			if (updateInvitationEmail($registryID, $token, $userID)) {
+				header("Location: " . strtok($_SERVER["REQUEST_URI"], "?"));
+			}
+		} else {
+			//information doesn't match
+			header("Location: home.php");
+		}
+	}
+	
 	$registryInvitations = getAcceptInvitedRegistries($_SESSION["userID"]);
 	
 	//if the user doesn't have any invitations, send them back to view.php
 	if ($registryInvitations == "") {
 		header("Location: view.php");
+		return;
 	}
 ?>
 <html>
